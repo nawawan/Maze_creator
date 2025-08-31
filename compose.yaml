@@ -1,0 +1,18 @@
+version: "1.0"
+
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - wasm
+
+  wasm:
+    build:
+      context: ./wasm
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./wasm:/usr/workspace/wasm
