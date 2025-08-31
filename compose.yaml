@@ -15,4 +15,4 @@ services:
       context: ./wasm
       dockerfile: ./Dockerfile
     volumes:
-      - ./wasm:/usr/workspace/wasm
+      - ./:/usr/workspace/
