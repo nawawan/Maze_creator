@@ -9,10 +9,12 @@ services:
       - "8080:80"
     depends_on:
       - frontend
+    command: ["nginx", "-g", "daemon off;"]
 
   frontend:
     build:
       context: ./frontend
       dockerfile: ./Dockerfile
+    command: ["npm", "run", "dev"]
     volumes:
       - ./:/usr/workspace/
