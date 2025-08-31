@@ -9,6 +9,6 @@ RUN rustup component add clippy
 RUN rustup component add rustfmt
 RUN cargo install wasm-pack
 
-WORKDIR /usr/workspace
+WORKDIR /usr/workspace/wasm
 
 VOLUME ./wasm:/usr/workspace/wasm

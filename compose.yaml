@@ -8,11 +8,13 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - wasm
+      - frontend
+    command: ["nginx", "-g", "daemon off;"]
 
-  wasm:
+  frontend:
     build:
-      context: ./wasm
+      context: ./frontend
       dockerfile: ./Dockerfile
+    command: ["npm", "run", "dev"]
     volumes:
-      - ./wasm:/usr/workspace/wasm
+      - ./:/usr/workspace/
