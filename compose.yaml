@@ -8,11 +8,11 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - wasm
+      - frontend
 
-  wasm:
+  frontend:
     build:
-      context: ./wasm
+      context: ./frontend
       dockerfile: ./Dockerfile
     volumes:
       - ./:/usr/workspace/
