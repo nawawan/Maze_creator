@@ -33,5 +33,5 @@ fn context(canvas: &HtmlCanvasElement) -> CanvasRenderingContext2d {
         .expect("canvas should has a 2d context")
         .expect("2d context is not available")
         .dyn_into::<web_sys::CanvasRenderingContext2d>()
-        .unwrap()
+        .expect("convert should be succeeded")
 }
