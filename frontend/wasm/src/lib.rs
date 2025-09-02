@@ -1,4 +1,5 @@
 mod maze;
+mod dom;
 
 use wasm_bindgen::prelude::*;
 
@@ -15,5 +16,6 @@ pub fn greet(name: &str) {
 
 #[wasm_bindgen]
 pub fn draw_maze() {
-    maze::draw_rect::run();
+    let context = dom::fetch_2d_context("canvas");
+    maze::draw_rect::run(&context);
 }
