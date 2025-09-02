@@ -1,5 +1,6 @@
 mod maze;
 mod dom;
+mod algo;
 
 use wasm_bindgen::prelude::*;
 
