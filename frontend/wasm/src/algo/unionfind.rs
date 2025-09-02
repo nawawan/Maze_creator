@@ -41,3 +41,42 @@ impl UnionFind {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn fetch_correct_root() {
+        let mut unionfind = UnionFind::new(10);
+        unionfind.merge(2, 5);
+
+        assert_eq!(2, unionfind.root(2));
+        assert_eq!(2, unionfind.root(5));
+        assert_eq!(1, unionfind.root(1));
+    }
+
+    #[test]
+    fn union_into_larger_subtree(){
+        let mut unionfind = UnionFind::new(10);
+        unionfind.merge(2, 5);
+        unionfind.merge(1, 5);
+
+        assert_eq!(2, unionfind.root(1));
+        assert_eq!(2, unionfind.root(5));
+        assert_eq!(2, unionfind.root(2));
+    }
+
+    #[test]
+    fn fetch_correct_size(){
+        let mut unionfind = UnionFind::new(10);
+        unionfind.merge(5, 6);
+        unionfind.merge(1, 5);
+
+        unionfind.merge(2, 9);
+
+        assert_eq!(3, unionfind.size(1));
+        assert_eq!(3, unionfind.size(5));
+        assert_eq!(2, unionfind.size(9));
+        assert_eq!(1, unionfind.size(3));
+    }
+}
