@@ -16,7 +16,7 @@ impl UnionFind {
     fn root(&mut self, node: usize) -> usize {
         assert!(node < self.n);
         if let Ok(parent) = self.size[node].try_into() {
-            let root_node = self.root(parent);
+            let root_node: usize = self.root(parent);
             self.size[node] = root_node as i32;
             return root_node;
         }
