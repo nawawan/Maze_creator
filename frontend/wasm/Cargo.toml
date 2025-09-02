@@ -8,4 +8,18 @@ edition = "2024"
 crate-type = ["cdylib"]
 
 [dependencies]
+anyhow = "1.0.99"
+js-sys = "0.3.77"
 wasm-bindgen = "0.2"
+wee_alloc = "0.4.5"
+
+
+[dependencies.web-sys]
+version = "0.3.77"
+features = [
+  'Document',
+  'Element',
+  'Window',
+  'HtmlCanvasElement',
+  'CanvasRenderingContext2d'
+]
