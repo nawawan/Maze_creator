@@ -81,7 +81,7 @@ function App() {
     <>
       <h1>迷路グリッドの設定</h1>
 
-      <form className="card" onSubmit={onSubmit} style={{ display: 'grid', gap: '12px', justifyItems: 'start' }}>
+      <form className="card" onSubmit={onSubmit} style={{ display: 'grid', gap: '12px', justifyItems: 'start', justifyContent: 'center' }}>
         <label>
           グリッド幅(px):
           <input
