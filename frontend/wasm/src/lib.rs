@@ -18,5 +18,5 @@ pub fn greet(name: &str) {
 #[wasm_bindgen]
 pub fn draw_maze() {
     let context = dom::fetch_2d_context("canvas");
-    let _ = maze::draw_rect::run(&context);
+    // let _ = maze::draw_shape::run(&context);
 }
