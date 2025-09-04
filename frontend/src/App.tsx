@@ -7,7 +7,6 @@ import {
   Container,
   CssBaseline,
   FormControlLabel,
-  Grid,
   Paper,
   Slider,
   Stack,
@@ -17,6 +16,7 @@ import {
   createTheme,
   ThemeProvider,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
@@ -129,7 +129,7 @@ function App() {
             </Typography>
             <Box component="form" onSubmit={onSubmit}>
               <Grid container spacing={2}>
-                <Grid item xs={12} md={4}>
+                <Grid xs={12} md={4}>
                   <TextField
                     fullWidth
                     label="グリッド幅 (px)"
@@ -138,19 +138,19 @@ function App() {
                     onChange={(e) =>
                       setParams((p) => ({ ...p, cellSize: Number(e.target.value) }))
                     }
-                    inputProps={{ min: 1 }}
+                    slotProps={{ input: { min: 1 } }}
                     error={Boolean(validation.errors.cellSize)}
                     helperText={validation.errors.cellSize || '1以上の数値'}
                   />
                 </Grid>
-                <Grid item xs={12} md={4}>
+                <Grid xs={12} md={4}>
                   <TextField
                     fullWidth
                     label="横のマス数"
                     type="number"
                     value={params.cols}
                     onChange={(e) => setParams((p) => ({ ...p, cols: Number(e.target.value) }))}
-                    inputProps={{ min: 1 }}
+                    slotProps={{ input: { min: 1 } }}
                     error={Boolean(validation.errors.cols)}
                     helperText={validation.errors.cols || '1以上の整数'}
                   />
@@ -162,13 +162,13 @@ function App() {
                     type="number"
                     value={params.rows}
                     onChange={(e) => setParams((p) => ({ ...p, rows: Number(e.target.value) }))}
-                    inputProps={{ min: 1 }}
+                    slotProps={{ input: { min: 1 } }}
                     error={Boolean(validation.errors.rows)}
                     helperText={validation.errors.rows || '1以上の整数'}
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <Stack spacing={1} sx={{ px: 1 }}>
                     <Typography variant="body2" color="text.secondary">
                       セル幅クイック調整
@@ -185,7 +185,7 @@ function App() {
                   </Stack>
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid xs={12} md={6}>
                   <Stack direction="row" spacing={1} alignItems="center" sx={{ height: '100%' }}>
                     <Typography variant="body2" color="text.secondary">
                       プリセット:
@@ -206,7 +206,7 @@ function App() {
                   </Stack>
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid xs={12}>
                   <Stack direction="row" alignItems="center" justifyContent="space-between">
                     <FormControlLabel
                       control={<Switch checked={autoPreview} onChange={(e) => setAutoPreview(e.target.checked)} />}
