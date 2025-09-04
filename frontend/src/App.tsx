@@ -16,7 +16,7 @@ import {
   createTheme,
   ThemeProvider,
 } from '@mui/material';
-import Grid from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
@@ -129,7 +129,7 @@ function App() {
             </Typography>
             <Box component="form" onSubmit={onSubmit}>
               <Grid container spacing={2}>
-                <Grid xs={12} md={4}>
+                <Grid item xs={12} md={4}>
                   <TextField
                     fullWidth
                     label="グリッド幅 (px)"
