@@ -1,3 +1,6 @@
+use rand::prelude::*;
+use rand::SeedableRng;
+
 use crate::algo::unionfind::UnionFind;
 
 // 縦heightマス・横widthマスのグリッドグラフについて、最小全域木を作成したときに使用しなかった辺を返す
@@ -8,7 +11,22 @@ pub fn extract_unused_maze_edges_by_kruskal(width: usize, height: usize) -> Vec<
             add_adjacent_edge(&mut edges, i, j, width, height);
         }
     }
+
+    let mut random_bytes = [0u8; 8];
+    getrandom::getrandom(&mut random_bytes).unwrap();
+    let mut rng = rand::rngs::SmallRng::seed_from_u64(u64::from_ne_bytes(random_bytes));
+    edges.shuffle(&mut rng);
     kruskal(width * height, edges)
+}
+
+pub fn index_2d_to_1d(row: usize, col: usize, width: usize) -> usize{
+    row * width + col
+}
+
+// row, columnという並びで返す。
+pub fn index_1d_to_2d(idx: usize, width: usize) -> (usize, usize) {
+    let row = idx / width;
+    (row, idx - row * width)
 }
 
 // グリッドグラフにおいて、隣接マスへの辺が存在したらedgesに追加する
