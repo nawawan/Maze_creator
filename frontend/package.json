@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5173",
-    "build:wasm": "cd wasm && wasm-pack build --target bundler --out-dir ../src/wasm",
+    "build:wasm": "cd wasm && wasm-pack build --target bundler --out-dir ../src/wasm && cd ..",
     "build": "npm run build:wasm && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
