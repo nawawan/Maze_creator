@@ -20,6 +20,8 @@ import Grid from '@mui/material/Grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
+import {draw_maze} from '../wasm/pkg';
+
 type GridParams = {
   cellSize: number; // 1マスの幅（px）
   cols: number; // 横方向のマス数
@@ -56,8 +58,8 @@ function App() {
   const drawGrid = ({ cellSize, cols, rows }: GridParams) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    // const ctx = canvas.getContext('2d');
+    // if (!ctx) return;
 
     // キャンバスサイズをグリッドに合わせる
     const width = cellSize * cols;
@@ -65,30 +67,27 @@ function App() {
     canvas.width = width;
     canvas.height = height;
 
-    // クリア
-    ctx.clearRect(0, 0, width, height);
+    console.log(`cellSize = ${cellSize}`);
 
-    // スタイル
-    ctx.strokeStyle = '#9aa0a6';
-    ctx.lineWidth = 1;
+    draw_maze(0, 0, rows, cols, cellSize);
 
-    // 縦線
-    for (let x = 0; x <= cols; x++) {
-      const px = Math.floor(x * cellSize) + 0.5; // crisp line
-      ctx.beginPath();
-      ctx.moveTo(px, 0);
-      ctx.lineTo(px, height);
-      ctx.stroke();
-    }
+    // // 縦線
+    // for (let x = 0; x <= cols; x++) {
+    //   const px = Math.floor(x * cellSize) + 0.5; // crisp line
+    //   ctx.beginPath();
+    //   ctx.moveTo(px, 0);
+    //   ctx.lineTo(px, height);
+    //   ctx.stroke();
+    // }
 
-    // 横線
-    for (let y = 0; y <= rows; y++) {
-      const py = Math.floor(y * cellSize) + 0.5; // crisp line
-      ctx.beginPath();
-      ctx.moveTo(0, py);
-      ctx.lineTo(width, py);
-      ctx.stroke();
-    }
+    // // 横線
+    // for (let y = 0; y <= rows; y++) {
+    //   const py = Math.floor(y * cellSize) + 0.5; // crisp line
+    //   ctx.beginPath();
+    //   ctx.moveTo(0, py);
+    //   ctx.lineTo(width, py);
+    //   ctx.stroke();
+    // }
   };
 
   // 自動プレビュー（デバウンス）

@@ -10,8 +10,10 @@ crate-type = ["cdylib"]
 [dependencies]
 anyhow = "1.0.99"
 js-sys = "0.3.77"
+rand = { version = "0.9.0", default-features = false, features = ["small_rng", "std"] }
 wasm-bindgen = "0.2"
 wee_alloc = "0.4.5"
+getrandom = { version = "0.2.15", features = ["js"] }
 
 
 [dependencies.web-sys]
