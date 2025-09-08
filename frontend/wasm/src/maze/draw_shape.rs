@@ -1,6 +1,6 @@
 use web_sys::{CanvasRenderingContext2d};
 
-use crate::algo::kruskal;
+use crate::algo::{grid, kruskal};
 use crate::maze::shape::Point;
 
 pub fn set_grid_line(ctx: &CanvasRenderingContext2d, from: (usize, usize), to: (usize, usize), space: f64)  {
@@ -14,8 +14,8 @@ pub fn set_wall_edges(ctx: &CanvasRenderingContext2d, width: usize, height: usiz
     let unused_vertex = kruskal::extract_unused_maze_edges_by_kruskal(width, height);
 
     for (node_left, node_right) in unused_vertex {
-        let from = kruskal::index_1d_to_2d(node_left, width);
-        let to = kruskal::index_1d_to_2d(node_right, width);
+        let from = grid::index_1d_to_2d(node_left, width);
+        let to = grid::index_1d_to_2d(node_right, width);
         set_boundary(&ctx, from, to, space);
     }
 }
