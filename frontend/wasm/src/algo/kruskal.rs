@@ -4,30 +4,51 @@ use rand::SeedableRng;
 use crate::algo::unionfind::UnionFind;
 use crate::algo::grid::grid_edges;
 
+
+enum KruskalResultEdge {
+    Used,
+    Unused,
+}
+
 // 縦heightマス・横widthマスのグリッドグラフについて、最小全域木を作成したときに使用しなかった辺を返す
-pub fn extract_unused_maze_edges_by_kruskal(width: usize, height: usize) -> Vec<(usize, usize)> {
-    let mut edges = grid_edges(width, height);
-    let mut random_bytes = [0u8; 8];
-    getrandom::getrandom(&mut random_bytes).unwrap();
-    let mut rng = rand::rngs::SmallRng::seed_from_u64(u64::from_ne_bytes(random_bytes));
-    edges.shuffle(&mut rng);
-    kruskal(width * height, edges)
+pub fn extract_unused_maze_edges_by_kruskal(width: usize, height: usize, step: usize) -> Vec<(usize, usize)> {
+    let edges = arrange_random_edges(width, height, step);
+    kruskal(width * height, edges, KruskalResultEdge::Used)
+}
+
+pub fn extract_used_maze_edges_by_kruskal(width: usize, height: usize, step: usize) -> Vec<(usize, usize)> {
+    let edges = arrange_random_edges(width, height, step);
+    kruskal(width * height, edges, KruskalResultEdge::Unused)
 }
 
 // kruskal法によって最小全域木を作成し、使用しなかった辺を返す
-fn kruskal(node_size: usize, edges: Vec<(usize, usize)>) -> Vec<(usize, usize)>{
+fn kruskal(node_size: usize, edges: Vec<(usize, usize)>, edge_result: KruskalResultEdge) -> Vec<(usize, usize)>{
     let mut unionfind = UnionFind::new(node_size);
     let mut unused_edge: Vec<(usize, usize)> = Vec::new();
+    let mut used_edge: Vec<(usize, usize)> = Vec::new();
 
     for (node_x, node_y) in edges {
         if !unionfind.same(node_x, node_y) {
             unionfind.merge(node_x, node_y);
+            used_edge.push((node_x, node_y));
         }
         else {
             unused_edge.push((node_x, node_y));
         }
     }
-    unused_edge
+    match edge_result {
+        KruskalResultEdge::Used => used_edge,
+        KruskalResultEdge::Unused => unused_edge
+    }
+}
+
+fn arrange_random_edges(width: usize, height: usize, step: usize) -> Vec<(usize, usize)>  {
+    let mut edges = grid_edges(width, height, step);
+    let mut random_bytes = [0u8; 8];
+    getrandom::getrandom(&mut random_bytes).unwrap();
+    let mut rng = rand::rngs::SmallRng::seed_from_u64(u64::from_ne_bytes(random_bytes));
+    edges.shuffle(&mut rng);
+    edges
 }
 
 #[cfg(test)]
@@ -47,7 +68,7 @@ mod tests {
                 edges.push((i, j));
             }
         } 
-        let unused_edges = kruskal(node_size, edges.clone());
+        let unused_edges = kruskal(node_size, edges.clone(), KruskalResultEdge::Used);
 
         // fetch node in spanning tree
         let mut set: HashSet<(usize, usize)> = HashSet::new();
@@ -76,7 +97,7 @@ mod tests {
             }
         } 
 
-        let unused_edges = kruskal(node_size, edges.clone());
+        let unused_edges = kruskal(node_size, edges.clone(), KruskalResultEdge::Unused);
 
         // MSTに必要な辺の数はnode_size - 1
         assert_eq!(edges.len(), unused_edges.len() + node_size - 1);
@@ -86,7 +107,7 @@ mod tests {
     fn create_correct_minimum_spanning_tree_in_grid_graph(){
         let width = 10;
         let height = 20;
-        let unused_edges = extract_unused_maze_edges_by_kruskal(width, height);
+        let unused_edges = extract_unused_maze_edges_by_kruskal(width, height, 1);
 
         // fetch node in spanning tree
         let mut set: HashSet<(usize, usize)> = HashSet::new();

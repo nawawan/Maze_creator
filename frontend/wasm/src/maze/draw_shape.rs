@@ -11,7 +11,7 @@ pub fn set_grid_line(ctx: &CanvasRenderingContext2d, from: (usize, usize), to: (
 }
 
 pub fn set_wall_edges(ctx: &CanvasRenderingContext2d, width: usize, height: usize, space: f64) {
-    let unused_vertex = kruskal::extract_unused_maze_edges_by_kruskal(width, height);
+    let unused_vertex = kruskal::extract_unused_maze_edges_by_kruskal(width, height, 1);
 
     for (node_left, node_right) in unused_vertex {
         let from = grid::index_1d_to_2d(node_left, width);
