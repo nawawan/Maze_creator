@@ -28,9 +28,7 @@ impl Line {
     }
 
     pub fn draw(&self, ctx: &CanvasRenderingContext2d) {
-        ctx.begin_path();
         ctx.move_to(self.from.x, self.from.y);
         ctx.line_to(self.to.x, self.to.y);
-        ctx.stroke();
     }
 }

@@ -42,6 +42,7 @@ fn kruskal(node_size: usize, edges: Vec<(usize, usize)>, edge_result: KruskalRes
     }
 }
 
+// ランダムな順番のgridグラフの辺を返す
 fn arrange_random_edges(width: usize, height: usize, step: usize) -> Vec<(usize, usize)>  {
     let mut edges = grid_edges(width, height, step);
     let mut random_bytes = [0u8; 8];
