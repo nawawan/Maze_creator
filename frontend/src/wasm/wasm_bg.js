@@ -206,6 +206,17 @@ export function draw_maze(from_x, from_y, row, col, space) {
     wasm.draw_maze(from_x, from_y, row, col, space);
 }
 
+/**
+ * @param {number} from_x
+ * @param {number} from_y
+ * @param {number} row
+ * @param {number} col
+ * @param {number} space
+ */
+export function draw_single_stroke_maze(from_x, from_y, row, col, space) {
+    wasm.draw_single_stroke_maze(from_x, from_y, row, col, space);
+}
+
 export function __wbg_alert_23b26d9c7696891c(arg0, arg1) {
     alert(getStringFromWasm0(arg0, arg1));
 };

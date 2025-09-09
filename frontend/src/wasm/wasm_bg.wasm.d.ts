@@ -3,6 +3,7 @@
 export const memory: WebAssembly.Memory;
 export const greet: (a: number, b: number) => void;
 export const draw_maze: (a: number, b: number, c: number, d: number, e: number) => void;
+export const draw_single_stroke_maze: (a: number, b: number, c: number, d: number, e: number) => void;
 export const __wbindgen_exn_store: (a: number) => void;
 export const __externref_table_alloc: () => number;
 export const __wbindgen_export_2: WebAssembly.Table;
