@@ -3,6 +3,15 @@ use web_sys::CanvasRenderingContext2d;
 use crate::algo::{grid, kruskal, single_stroke};
 use crate::maze::shape::Point;
 
+use wasm_bindgen::prelude::*;
+#[wasm_bindgen]
+extern "C" {
+    pub fn alert(s: &str);
+
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
+
 pub fn set_line_between_grid(
     ctx: &CanvasRenderingContext2d,
     from: (usize, usize),
@@ -11,8 +20,8 @@ pub fn set_line_between_grid(
 ) {
     let from = Point::new(from.0 as f64 * space, from.1 as f64 * space);
     let to = Point::new(to.0 as f64 * space, to.1 as f64 * space);
-    ctx.move_to(from.x, from.y);
-    ctx.line_to(to.x, to.y);
+    ctx.move_to(from.y, from.x);
+    ctx.line_to(to.y, to.x);
 }
 
 pub fn set_wall_edges(ctx: &CanvasRenderingContext2d, width: usize, height: usize, space: f64) {
@@ -46,7 +55,7 @@ pub fn set_single_stroke_maze(
     space: f64,
 ) {
     let edges = single_stroke::single_stroke_maze(width, height);
-    draw_lines(ctx, edges, width, space);
+    draw_lines(ctx, edges, width + 1, space);
 }
 
 fn draw_lines(
