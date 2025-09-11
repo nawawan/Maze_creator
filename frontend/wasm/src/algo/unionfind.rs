@@ -1,4 +1,3 @@
-
 // union by size
 pub struct UnionFind {
     size: Vec<i32>,
@@ -7,7 +6,7 @@ pub struct UnionFind {
 
 impl UnionFind {
     pub fn new(n: usize) -> Self {
-        UnionFind{
+        UnionFind {
             size: vec![-1; n],
             n: n,
         }
@@ -64,7 +63,7 @@ mod tests {
     }
 
     #[test]
-    fn union_into_larger_subtree(){
+    fn union_into_larger_subtree() {
         let mut unionfind = UnionFind::new(10);
         unionfind.merge(2, 5);
         unionfind.merge(1, 5);
@@ -75,7 +74,7 @@ mod tests {
     }
 
     #[test]
-    fn cancel_merge_when_root_is_same(){
+    fn cancel_merge_when_root_is_same() {
         let mut unionfind = UnionFind::new(10);
         unionfind.merge(1, 3);
         unionfind.merge(1, 3);
@@ -99,7 +98,7 @@ mod tests {
     }
 
     #[test]
-    fn fetch_correct_size(){
+    fn fetch_correct_size() {
         let mut unionfind = UnionFind::new(10);
         unionfind.merge(5, 6);
         unionfind.merge(1, 5);

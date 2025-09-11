@@ -9,7 +9,7 @@ enum Offset {
     Zero,
 }
 
-pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, usize)>{
+pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, usize)> {
     width -= 1;
     height -= 1;
     if width % 2 == 1 && height % 2 == 1 {
@@ -17,7 +17,8 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, us
     }
 
     let step = 2;
-    let mut used_grid_line = kruskal::extract_used_maze_edges_by_kruskal(width / 2 * 2, height / 2 * 2, step);
+    let mut used_grid_line =
+        kruskal::extract_used_maze_edges_by_kruskal(width / 2 * 2, height / 2 * 2, step);
 
     let mut used_grid_edges = divide_edges(&mut used_grid_line, step);
 
@@ -26,16 +27,18 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, us
     let offset = match u8::from_ne_bytes(random_bytes) % 2 {
         0 => Offset::Zero,
         1 => Offset::One,
-        _ => panic!("impossible value")
+        _ => panic!("impossible value"),
     };
     if width % 2 == 1 {
         shift_horizontal(&mut used_grid_edges, width, height, step, offset);
-    }
-    else if height % 2 == 1 {
+    } else if height % 2 == 1 {
         shift_vertical(&mut used_grid_edges, width, height, step, offset);
     }
 
-    let mut edges: Vec<(usize, usize)> = used_grid_edges.iter().map(|(start, end)| (start + width + 1, end + width + 1)).collect();
+    let mut edges: Vec<(usize, usize)> = used_grid_edges
+        .iter()
+        .map(|(start, end)| (start + width + 1, end + width + 1))
+        .collect();
 
     let mut used_grid = vec![false; width * height];
     let size = width * height;
@@ -58,7 +61,11 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, us
         for i in 0..4 {
             let nx = x as i32 + dx[i];
             let ny = y as i32 + dy[i];
-            if 0 <= nx && nx < height.try_into().unwrap() && 0 <= ny && ny < width.try_into().unwrap() {
+            if 0 <= nx
+                && nx < height.try_into().unwrap()
+                && 0 <= ny
+                && ny < width.try_into().unwrap()
+            {
                 let nv = x * width + y;
                 if used_grid[nv] {
                     continue;
@@ -69,8 +76,6 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, us
         }
     }
     edges
-
-
 }
 
 fn divide_edges(lines: &mut Vec<(usize, usize)>, step: usize) -> Vec<(usize, usize)> {
@@ -87,43 +92,53 @@ fn divide_edges(lines: &mut Vec<(usize, usize)>, step: usize) -> Vec<(usize, usi
     edges
 }
 
-fn shift_vertical(edges: &mut Vec<(usize, usize)>, width: usize, height: usize, step: usize, offset: Offset) {
+fn shift_vertical(
+    edges: &mut Vec<(usize, usize)>,
+    width: usize,
+    height: usize,
+    step: usize,
+    offset: Offset,
+) {
     match offset {
         Offset::Zero => {
             for row in (0..height).step_by(step) {
                 let pos = row * width + width - 1;
                 edges.push((pos - 1, pos));
             }
-        },
+        }
         Offset::One => {
             edges.iter_mut().for_each(|(_, y)| *y += 1);
             for row in (0..height).step_by(step) {
                 let pos = row * width;
                 edges.push((pos, pos + 1));
             }
-        },
+        }
     }
 }
 
-fn shift_horizontal(edges: &mut Vec<(usize, usize)>, width: usize, height: usize, step: usize, offset: Offset) {
+fn shift_horizontal(
+    edges: &mut Vec<(usize, usize)>,
+    width: usize,
+    height: usize,
+    step: usize,
+    offset: Offset,
+) {
     match offset {
         Offset::Zero => {
             for col in (0..width).step_by(step) {
                 let pos = (height - 1) * width + col;
                 edges.push((pos - width, pos));
             }
-        },
+        }
         Offset::One => {
             edges.iter_mut().for_each(|(x, _)| *x += 1);
             for col in (0..width).step_by(step) {
                 let pos = col;
                 edges.push((pos, pos + width));
             }
-        },
+        }
     }
 }
 
-
 #[cfg(test)]
-mod tests {
-}
+mod tests {}

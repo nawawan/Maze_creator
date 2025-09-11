@@ -1,11 +1,13 @@
-mod maze;
-mod dom;
 mod algo;
+mod dom;
+mod maze;
 
 use wasm_bindgen::prelude::*;
 
-use crate::maze::{draw_shape::{set_single_stroke_maze, set_wall_edges}, shape::Point};
-
+use crate::maze::{
+    draw_shape::{set_single_stroke_maze, set_wall_edges},
+    shape::Point,
+};
 
 #[wasm_bindgen]
 extern "C" {
@@ -26,7 +28,7 @@ pub fn draw_maze(from_x: f64, from_y: f64, row: usize, col: usize, space: f64) {
 
     let from = Point::new(from_x, from_y);
     let width = space * col as f64;
-    let height= space * row as f64;
+    let height = space * row as f64;
 
     ctx.clear_rect(from.x, from.y, width, height);
 
@@ -40,7 +42,6 @@ pub fn draw_maze(from_x: f64, from_y: f64, row: usize, col: usize, space: f64) {
     ctx.stroke();
 }
 
-
 #[wasm_bindgen]
 pub fn draw_single_stroke_maze(from_x: f64, from_y: f64, row: usize, col: usize, space: f64) {
     if row % 2 == 1 && col % 2 == 1 {
@@ -53,7 +54,7 @@ pub fn draw_single_stroke_maze(from_x: f64, from_y: f64, row: usize, col: usize,
 
     let from = Point::new(from_x, from_y);
     let width = space * col as f64;
-    let height= space * row as f64;
+    let height = space * row as f64;
 
     ctx.clear_rect(from.x, from.y, width, height);
 
