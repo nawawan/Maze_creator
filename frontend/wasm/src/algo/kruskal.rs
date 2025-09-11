@@ -71,7 +71,7 @@ fn arrange_random_edges(width: usize, height: usize, step: usize) -> Vec<(usize,
 #[cfg(test)]
 mod tests {
     use rstest::*;
-    use std::{collections::HashSet, hash::Hash};
+    use std::collections::HashSet;
 
     use super::*;
 
@@ -126,13 +126,33 @@ mod tests {
     #[case(10, 20, 1)]
     #[case(10, 20, 2)]
     #[case(1000, 1000, 13)]
+    #[case(50, 100, 7)]
     #[case(5, 10, 7)]
-    fn create_correct_minimum_spanning_tree_in_grid_graph(
+    fn create_correct_minimum_spanning_tree_from_unused_edges_in_grid_graph(
         #[case] width: usize,
         #[case] height: usize,
         #[case] step: usize,
     ) {
-        let nodes = create_spanning_tree(width, height, step);
+        let nodes = create_spanning_tree_from_unused_edges(width, height, step);
+
+        let w = (width - 1) / step + 1;
+        let h = (height - 1) / step + 1;
+
+        assert_eq!(w * h, nodes.len());
+    }
+
+    #[rstest]
+    #[case(10, 20, 1)]
+    #[case(10, 20, 2)]
+    #[case(1000, 1000, 13)]
+    #[case(50, 100, 7)]
+    #[case(5, 10, 7)]
+    fn create_correct_minimum_spanning_tree_from_used_edges_in_grid_graph(
+        #[case] width: usize,
+        #[case] height: usize,
+        #[case] step: usize,
+    ) {
+        let nodes = create_spanning_tree_from_used_edges(width, height, step);
 
         let w = (width - 1) / step + 1;
         let h = (height - 1) / step + 1;
@@ -144,16 +164,33 @@ mod tests {
     #[case(1, 1, 1)]
     #[case(2, 10, 12)]
     #[case(100, 100, 101)]
-    fn invalid_input_creates_empty_tree(
+    fn invalid_input_creates_empty_tree_from_unused_edges(
         #[case] width: usize,
         #[case] height: usize,
         #[case] step: usize,
     ) {
-        let nodes = create_spanning_tree(width, height, step);
+        let nodes = create_spanning_tree_from_unused_edges(width, height, step);
         assert_eq!(0, nodes.len());
     }
 
-    fn create_spanning_tree(width: usize, height: usize, step: usize) -> HashSet<usize> {
+    #[rstest]
+    #[case(1, 1, 1)]
+    #[case(2, 10, 12)]
+    #[case(100, 100, 101)]
+    fn invalid_input_creates_empty_tree_from_used_edges(
+        #[case] width: usize,
+        #[case] height: usize,
+        #[case] step: usize,
+    ) {
+        let nodes = create_spanning_tree_from_used_edges(width, height, step);
+        assert_eq!(0, nodes.len());
+    }
+
+    fn create_spanning_tree_from_unused_edges(
+        width: usize,
+        height: usize,
+        step: usize,
+    ) -> HashSet<usize> {
         let unused_edges = extract_unused_maze_edges_by_kruskal(width, height, step);
 
         // fetch node in spanning tree
@@ -176,6 +213,22 @@ mod tests {
                     nodes.insert(i * width + j + step);
                 }
             }
+        }
+        nodes
+    }
+
+    fn create_spanning_tree_from_used_edges(
+        width: usize,
+        height: usize,
+        step: usize,
+    ) -> HashSet<usize> {
+        let used_edges = extract_used_maze_edges_by_kruskal(width, height, step);
+
+        // fetch node in spanning tree
+        let mut nodes: HashSet<usize> = HashSet::new();
+        for (node_left, node_right) in used_edges {
+            nodes.insert(node_left);
+            nodes.insert(node_right);
         }
         nodes
     }
