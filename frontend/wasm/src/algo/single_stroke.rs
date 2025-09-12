@@ -40,7 +40,7 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, us
     };
 
     if width % 2 == 0 {
-        shift_horizontal(&mut used_grid_edges, width, height, step, offset);
+        shift_horizontal(&mut used_grid_edges, width - 1, height, step, offset);
     } else if height % 2 == 0 {
         shift_vertical(&mut used_grid_edges, width, height, step, offset);
     }
@@ -52,10 +52,6 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, us
         .iter()
         .map(|(start, end)| (start / width * w + start % width + w + 1, end / width * w + end % width + w + 1))
         .collect();
-
-    for (start, end) in &edges {
-        log_str(&format!("start = {}, end = {}", start, end));
-    }
 
     let size = w * h;
     let mut used_grid = vec![false; size];
@@ -115,18 +111,22 @@ fn shift_horizontal(
 ) {
     match offset {
         Offset::Zero => {
+            edges.iter_mut().for_each(|(x, y)| {
+                *x = *x / width * (width + 1) + *x % width;
+                *y = *y / width * (width + 1) + *y % width;
+            });
             for row in (0..height).step_by(step) {
-                let pos = row * width + width - 1;
+                let pos = row * (width + 1) + width;
                 edges.push((pos - 1, pos));
             }
         }
         Offset::One => {
             edges.iter_mut().for_each(|(x, y)| {
-                *x += 1;
-                *y += 1;
+                *x = *x / width * (width + 1) + *x % width + 1;
+                *y = *y / width * (width + 1) + *y % width + 1; 
             });
             for row in (0..height).step_by(step) {
-                let pos = row * width;
+                let pos = row * (width + 1);
                 edges.push((pos, pos + 1));
             }
         }
