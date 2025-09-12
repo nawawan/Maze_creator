@@ -1,4 +1,4 @@
-pub mod unionfind;
+pub mod grid;
 pub mod kruskal;
 pub mod single_stroke;
-pub mod grid;
+pub mod unionfind;
