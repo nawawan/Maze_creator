@@ -98,24 +98,6 @@ function App() {
     } else {
       draw_maze(0, 0, rows, cols, cellSize);
     }
-
-    // // 縦線
-    // for (let x = 0; x <= cols; x++) {
-    //   const px = Math.floor(x * cellSize) + 0.5; // crisp line
-    //   ctx.beginPath();
-    //   ctx.moveTo(px, 0);
-    //   ctx.lineTo(px, height);
-    //   ctx.stroke();
-    // }
-
-    // // 横線
-    // for (let y = 0; y <= rows; y++) {
-    //   const py = Math.floor(y * cellSize) + 0.5; // crisp line
-    //   ctx.beginPath();
-    //   ctx.moveTo(0, py);
-    //   ctx.lineTo(width, py);
-    //   ctx.stroke();
-    // }
   };
 
   // 自動プレビュー（デバウンス）
@@ -334,7 +316,7 @@ function App() {
                   width: "fit-content",
                 }}
               >
-                <canvas id="canvas" ref={canvasRef} />
+                <canvas id="canvas" ref={canvasRef} style={{display: 'block'}} />
               </Box>
             </Stack>
           </Paper>
