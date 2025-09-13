@@ -22,7 +22,7 @@ import Grid from '@mui/material/Grid';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
-import { draw_maze, draw_single_stroke_maze } from '../wasm/pkg/wasm';
+import { draw_maze, draw_single_stroke_maze } from './wasm';
 
 type GridParams = {
   cellSize: number; // 1マスの幅（px）
@@ -39,6 +39,7 @@ function App() {
   const [params, setParams] = useState<GridParams>(DEFAULT_PARAMS);
   const [autoPreview, setAutoPreview] = useState<boolean>(true);
   const [mode, setMode] = useState<Mode>('random');
+  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
 
   const { widthPx, heightPx } = useMemo(() => ({
     widthPx: params.cellSize * params.cols,
@@ -126,10 +127,10 @@ function App() {
 
   const theme = useMemo(() => createTheme({
     palette: {
-      mode: 'light',
+      mode: themeMode,
     },
     shape: { borderRadius: 10 },
-  }), []);
+  }), [themeMode]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -230,10 +231,16 @@ function App() {
                     </Typography>
                   )}
                   <Stack direction="row" alignItems="center" justifyContent="space-between">
-                    <FormControlLabel
-                      control={<Switch checked={autoPreview} onChange={(e) => setAutoPreview(e.target.checked)} />}
-                      label="自動プレビュー"
-                    />
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <FormControlLabel
+                        control={<Switch checked={autoPreview} onChange={(e) => setAutoPreview(e.target.checked)} />}
+                        label="自動プレビュー"
+                      />
+                      <FormControlLabel
+                        control={<Switch checked={themeMode === 'dark'} onChange={(e) => setThemeMode(e.target.checked ? 'dark' : 'light')} />}
+                        label="ダークモード"
+                      />
+                    </Stack>
                     <Stack direction="row" spacing={1}>
                       <Button
                         type="submit"
