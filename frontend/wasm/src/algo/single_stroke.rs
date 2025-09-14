@@ -1,10 +1,12 @@
-use crate::algo::kruskal;
+use crate::algo::{kruskal, shape::Point};
 use std::{collections::VecDeque, mem::swap};
 
 enum Offset {
     One,
     Zero,
 }
+
+const BIG_NUM: usize = 1000000000;
 
 pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, usize)> {
     width -= 1;
@@ -85,15 +87,24 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, us
     edges
 }
 
-fn divide_edges(lines: &mut Vec<(usize, usize)>, step: usize) -> Vec<(usize, usize)> {
+fn divide_edges(
+    lines: &Vec<(Point<usize>, Point<usize>)>,
+    step: usize,
+) -> Vec<(Point<usize>, Point<usize>)> {
     let mut edges = Vec::with_capacity(lines.len() * step);
+    let width = BIG_NUM;
     for (start, end) in lines {
-        if start > end {
-            swap(start, end);
+        let mut from = start.flatten(width);
+        let mut to = end.flatten(width);
+        if from > to {
+            swap(&mut from, &mut to);
         }
-        let interval = (*end - *start) / step;
-        for line_begin in (*start..*end).step_by(interval) {
-            edges.push((line_begin, line_begin + interval));
+        let interval = (to - from) / step;
+        for line_begin in (from..to).step_by(interval) {
+            edges.push((
+                Point::<usize>::from_1d_index(line_begin, width),
+                Point::<usize>::from_1d_index(line_begin + interval, width),
+            ));
         }
     }
     edges

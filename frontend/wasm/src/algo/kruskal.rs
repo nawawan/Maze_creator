@@ -2,6 +2,7 @@ use rand::SeedableRng;
 use rand::prelude::*;
 
 use crate::algo::grid::grid_edges;
+use crate::algo::shape::Point;
 use crate::algo::unionfind::UnionFind;
 
 pub enum KruskalResultEdge {
@@ -15,12 +16,22 @@ pub fn extract_maze_edges_by_kruskal(
     height: usize,
     step: usize,
     result: KruskalResultEdge,
-) -> Vec<(usize, usize)> {
+) -> Vec<(Point<usize>, Point<usize>)> {
     if width <= step && height <= step {
         return Vec::new();
     }
     let edges = arrange_random_edges(width, height, step);
-    kruskal(width * height, edges, result)
+    let result_edges = kruskal(width * height, edges, result);
+
+    result_edges
+        .iter()
+        .map(|(x, y)| {
+            (
+                Point::new(x / width, x % width),
+                Point::new(y / width, y % width),
+            )
+        })
+        .collect()
 }
 
 // kruskal法によって最小全域木を作成し、使用しなかった辺を返す
@@ -184,7 +195,7 @@ mod tests {
             extract_maze_edges_by_kruskal(width, height, step, KruskalResultEdge::Unused);
 
         // fetch node in spanning tree
-        let mut set: HashSet<(usize, usize)> = HashSet::new();
+        let mut set: HashSet<(Point<usize>, Point<usize>)> = HashSet::new();
         unused_edges.into_iter().for_each(|x| {
             set.insert(x);
         });
@@ -192,8 +203,8 @@ mod tests {
         let mut nodes: HashSet<usize> = HashSet::new();
         for i in (0..height).step_by(step) {
             for j in (0..width).step_by(step) {
-                let vertical = (i * width + j, (i + step) * width + j);
-                let horizontal = (i * width + j, i * width + j + step);
+                let vertical = (Point::new(i, j), Point::new(i + step, j));
+                let horizontal = (Point::new(i, j), Point::new(i, j + step));
                 if i + step < height && !set.contains(&vertical) {
                     nodes.insert(i * width + j);
                     nodes.insert((i + step) * width + j);
@@ -211,12 +222,12 @@ mod tests {
         width: usize,
         height: usize,
         step: usize,
-    ) -> HashSet<usize> {
+    ) -> HashSet<Point<usize>> {
         let used_edges =
             extract_maze_edges_by_kruskal(width, height, step, KruskalResultEdge::Used);
 
         // fetch node in spanning tree
-        let mut nodes: HashSet<usize> = HashSet::new();
+        let mut nodes: HashSet<Point<usize>> = HashSet::new();
         for (node_left, node_right) in used_edges {
             nodes.insert(node_left);
             nodes.insert(node_right);
