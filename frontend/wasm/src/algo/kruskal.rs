@@ -13,7 +13,8 @@ pub enum KruskalResultEdge {
 pub fn extract_maze_edges_by_kruskal(
     width: usize,
     height: usize,
-    step: usize, result: KruskalResultEdge
+    step: usize,
+    result: KruskalResultEdge,
 ) -> Vec<(usize, usize)> {
     if width <= step && height <= step {
         return Vec::new();
@@ -179,7 +180,8 @@ mod tests {
         height: usize,
         step: usize,
     ) -> HashSet<usize> {
-        let unused_edges = extract_maze_edges_by_kruskal(width, height, step, KruskalResultEdge::Unused);
+        let unused_edges =
+            extract_maze_edges_by_kruskal(width, height, step, KruskalResultEdge::Unused);
 
         // fetch node in spanning tree
         let mut set: HashSet<(usize, usize)> = HashSet::new();
@@ -210,7 +212,8 @@ mod tests {
         height: usize,
         step: usize,
     ) -> HashSet<usize> {
-        let used_edges = extract_maze_edges_by_kruskal(width, height, step, KruskalResultEdge::Used);
+        let used_edges =
+            extract_maze_edges_by_kruskal(width, height, step, KruskalResultEdge::Used);
 
         // fetch node in spanning tree
         let mut nodes: HashSet<usize> = HashSet::new();

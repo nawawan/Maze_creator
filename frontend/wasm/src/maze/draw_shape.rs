@@ -1,6 +1,5 @@
 use web_sys::CanvasRenderingContext2d;
 
-use crate::algo::{grid, kruskal, single_stroke};
 use crate::maze::shape::Point;
 
 use wasm_bindgen::prelude::*;
