@@ -22,7 +22,7 @@ import Grid from "@mui/material/Grid";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
-import { draw_maze, draw_single_stroke_maze } from "./wasm";
+import { draw_maze, MazeType} from "./wasm";
 
 type GridParams = {
   cellSize: number; // 1マスの幅（px）
@@ -94,9 +94,9 @@ function App() {
     canvas.width = width;
     canvas.height = height;
     if (m === "single") {
-      draw_single_stroke_maze(0, 0, rows, cols, cellSize);
+      draw_maze(0, 0, rows, cols, cellSize, MazeType.Random);
     } else {
-      draw_maze(0, 0, rows, cols, cellSize);
+      draw_maze(0, 0, rows, cols, cellSize, MazeType.SingleStroke);
     }
   };
 

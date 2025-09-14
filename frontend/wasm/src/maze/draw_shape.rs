@@ -24,16 +24,6 @@ pub fn set_line_between_grid(
     ctx.line_to(to.y, to.x);
 }
 
-pub fn set_wall_edges(ctx: &CanvasRenderingContext2d, width: usize, height: usize, space: f64) {
-    let unused_vertex = kruskal::extract_unused_maze_edges_by_kruskal(width, height, 1);
-
-    for (node_left, node_right) in unused_vertex {
-        let from = grid::index_1d_to_2d(node_left, width);
-        let to = grid::index_1d_to_2d(node_right, width);
-        set_grid_boundary(&ctx, from, to, space);
-    }
-}
-
 pub fn set_grid_boundary(
     ctx: &CanvasRenderingContext2d,
     from: (usize, usize),
@@ -48,17 +38,7 @@ pub fn set_grid_boundary(
     }
 }
 
-pub fn set_single_stroke_maze(
-    ctx: &CanvasRenderingContext2d,
-    width: usize,
-    height: usize,
-    space: f64,
-) {
-    let edges = single_stroke::single_stroke_maze(width, height);
-    draw_lines(ctx, edges, width + 1, space);
-}
-
-fn draw_lines(
+pub fn draw_lines(
     ctx: &CanvasRenderingContext2d,
     edges: Vec<(usize, usize)>,
     width: usize,
