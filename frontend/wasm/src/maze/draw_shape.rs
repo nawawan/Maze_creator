@@ -1,6 +1,6 @@
 use web_sys::CanvasRenderingContext2d;
 
-use crate::maze::shape::Point;
+use crate::algo::shape::Point;
 
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]

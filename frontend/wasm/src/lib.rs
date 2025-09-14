@@ -3,7 +3,8 @@ mod dom;
 mod maze;
 use wasm_bindgen::prelude::*;
 
-use crate::maze::{random_maze, shape::Point, single_stroke_maze};
+use crate::algo::shape::Point;
+use crate::maze::{random_maze, single_stroke_maze};
 
 #[wasm_bindgen(start)]
 pub fn start() {
