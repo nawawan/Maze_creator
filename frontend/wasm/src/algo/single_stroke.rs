@@ -1,14 +1,5 @@
-use std::{collections::VecDeque, mem::swap};
-
-use rand::SeedableRng;
-use wasm_bindgen::JsValue;
-use web_sys::console;
-
 use crate::algo::kruskal;
-
-fn log_str(s: &str) {
-    console::log_1(&JsValue::from_str(s));
-}
+use std::{collections::VecDeque, mem::swap};
 
 enum Offset {
     One,
@@ -23,10 +14,11 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, us
     }
 
     let step = 2;
-    let mut used_grid_line = kruskal::extract_used_maze_edges_by_kruskal(
+    let mut used_grid_line = kruskal::extract_maze_edges_by_kruskal(
         width - (width + 1) % 2,
         height - (height + 1) % 2,
         step,
+        kruskal::KruskalResultEdge::Used,
     );
 
     let mut used_grid_edges = divide_edges(&mut used_grid_line, step);
@@ -50,7 +42,12 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, us
 
     let mut edges: Vec<(usize, usize)> = used_grid_edges
         .iter()
-        .map(|(start, end)| (start / width * w + start % width + w + 1, end / width * w + end % width + w + 1))
+        .map(|(start, end)| {
+            (
+                start / width * w + start % width + w + 1,
+                end / width * w + end % width + w + 1,
+            )
+        })
         .collect();
 
     let size = w * h;
@@ -75,7 +72,7 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(usize, us
         for i in 0..4 {
             let nx = x as i32 + dx[i];
             let ny = y as i32 + dy[i];
-            if 0 <= nx && nx < h as i32 && 0 <= ny &&  ny < w as i32 {
+            if 0 <= nx && nx < h as i32 && 0 <= ny && ny < w as i32 {
                 let nv = w * nx as usize + ny as usize;
                 if used_grid[nv] {
                     continue;
@@ -123,7 +120,7 @@ fn shift_horizontal(
         Offset::One => {
             edges.iter_mut().for_each(|(x, y)| {
                 *x = *x / width * (width + 1) + *x % width + 1;
-                *y = *y / width * (width + 1) + *y % width + 1; 
+                *y = *y / width * (width + 1) + *y % width + 1;
             });
             for row in (0..height).step_by(step) {
                 let pos = row * (width + 1);

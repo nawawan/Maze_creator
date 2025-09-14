@@ -4,34 +4,22 @@ use rand::prelude::*;
 use crate::algo::grid::grid_edges;
 use crate::algo::unionfind::UnionFind;
 
-enum KruskalResultEdge {
+pub enum KruskalResultEdge {
     Used,
     Unused,
 }
 
 // 縦heightマス・横widthマスのグリッドグラフについて、最小全域木を作成したときに使用しなかった辺を返す
-pub fn extract_unused_maze_edges_by_kruskal(
+pub fn extract_maze_edges_by_kruskal(
     width: usize,
     height: usize,
-    step: usize,
+    step: usize, result: KruskalResultEdge
 ) -> Vec<(usize, usize)> {
     if width <= step && height <= step {
         return Vec::new();
     }
     let edges = arrange_random_edges(width, height, step);
-    kruskal(width * height, edges, KruskalResultEdge::Unused)
-}
-
-pub fn extract_used_maze_edges_by_kruskal(
-    width: usize,
-    height: usize,
-    step: usize,
-) -> Vec<(usize, usize)> {
-    if width <= step && height <= step {
-        return Vec::new();
-    }
-    let edges = arrange_random_edges(width, height, step);
-    kruskal(width * height, edges, KruskalResultEdge::Used)
+    kruskal(width * height, edges, result)
 }
 
 // kruskal法によって最小全域木を作成し、使用しなかった辺を返す
@@ -191,7 +179,7 @@ mod tests {
         height: usize,
         step: usize,
     ) -> HashSet<usize> {
-        let unused_edges = extract_unused_maze_edges_by_kruskal(width, height, step);
+        let unused_edges = extract_maze_edges_by_kruskal(width, height, step, KruskalResultEdge::Unused);
 
         // fetch node in spanning tree
         let mut set: HashSet<(usize, usize)> = HashSet::new();
@@ -222,7 +210,7 @@ mod tests {
         height: usize,
         step: usize,
     ) -> HashSet<usize> {
-        let used_edges = extract_used_maze_edges_by_kruskal(width, height, step);
+        let used_edges = extract_maze_edges_by_kruskal(width, height, step, KruskalResultEdge::Used);
 
         // fetch node in spanning tree
         let mut nodes: HashSet<usize> = HashSet::new();
