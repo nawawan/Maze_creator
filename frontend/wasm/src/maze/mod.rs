@@ -1,2 +1,3 @@
 pub mod draw_shape;
-pub mod shape;
+pub mod random_maze;
+pub mod single_stroke_maze;

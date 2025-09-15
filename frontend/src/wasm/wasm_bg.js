@@ -55,6 +55,71 @@ function getStringFromWasm0(ptr, len) {
     return decodeText(ptr, len);
 }
 
+function debugString(val) {
+    // primitive types
+    const type = typeof val;
+    if (type == 'number' || type == 'boolean' || val == null) {
+        return  `${val}`;
+    }
+    if (type == 'string') {
+        return `"${val}"`;
+    }
+    if (type == 'symbol') {
+        const description = val.description;
+        if (description == null) {
+            return 'Symbol';
+        } else {
+            return `Symbol(${description})`;
+        }
+    }
+    if (type == 'function') {
+        const name = val.name;
+        if (typeof name == 'string' && name.length > 0) {
+            return `Function(${name})`;
+        } else {
+            return 'Function';
+        }
+    }
+    // objects
+    if (Array.isArray(val)) {
+        const length = val.length;
+        let debug = '[';
+        if (length > 0) {
+            debug += debugString(val[0]);
+        }
+        for(let i = 1; i < length; i++) {
+            debug += ', ' + debugString(val[i]);
+        }
+        debug += ']';
+        return debug;
+    }
+    // Test for built-in
+    const builtInMatches = /\[object ([^\]]+)\]/.exec(toString.call(val));
+    let className;
+    if (builtInMatches && builtInMatches.length > 1) {
+        className = builtInMatches[1];
+    } else {
+        // Failed to match the standard '[object ClassName]'
+        return toString.call(val);
+    }
+    if (className == 'Object') {
+        // we're a user defined class or Object
+        // JSON.stringify avoids problems with cycles, and is generally much
+        // easier than looping through ownProperties of `val`.
+        try {
+            return 'Object(' + JSON.stringify(val) + ')';
+        } catch (_) {
+            return 'Object';
+        }
+    }
+    // errors
+    if (val instanceof Error) {
+        return `${val.name}: ${val.message}\n${val.stack}`;
+    }
+    // TODO we could test for more things here, like `Set`s and `Map`s.
+    return className;
+}
+
 let WASM_VECTOR_LEN = 0;
 
 const lTextEncoder = typeof TextEncoder === 'undefined' ? (0, module.require)('util').TextEncoder : TextEncoder;
@@ -122,71 +187,6 @@ function getDataViewMemory0() {
     return cachedDataViewMemory0;
 }
 
-function debugString(val) {
-    // primitive types
-    const type = typeof val;
-    if (type == 'number' || type == 'boolean' || val == null) {
-        return  `${val}`;
-    }
-    if (type == 'string') {
-        return `"${val}"`;
-    }
-    if (type == 'symbol') {
-        const description = val.description;
-        if (description == null) {
-            return 'Symbol';
-        } else {
-            return `Symbol(${description})`;
-        }
-    }
-    if (type == 'function') {
-        const name = val.name;
-        if (typeof name == 'string' && name.length > 0) {
-            return `Function(${name})`;
-        } else {
-            return 'Function';
-        }
-    }
-    // objects
-    if (Array.isArray(val)) {
-        const length = val.length;
-        let debug = '[';
-        if (length > 0) {
-            debug += debugString(val[0]);
-        }
-        for(let i = 1; i < length; i++) {
-            debug += ', ' + debugString(val[i]);
-        }
-        debug += ']';
-        return debug;
-    }
-    // Test for built-in
-    const builtInMatches = /\[object ([^\]]+)\]/.exec(toString.call(val));
-    let className;
-    if (builtInMatches && builtInMatches.length > 1) {
-        className = builtInMatches[1];
-    } else {
-        // Failed to match the standard '[object ClassName]'
-        return toString.call(val);
-    }
-    if (className == 'Object') {
-        // we're a user defined class or Object
-        // JSON.stringify avoids problems with cycles, and is generally much
-        // easier than looping through ownProperties of `val`.
-        try {
-            return 'Object(' + JSON.stringify(val) + ')';
-        } catch (_) {
-            return 'Object';
-        }
-    }
-    // errors
-    if (val instanceof Error) {
-        return `${val.name}: ${val.message}\n${val.stack}`;
-    }
-    // TODO we could test for more things here, like `Set`s and `Map`s.
-    return className;
-}
-
 export function start() {
     wasm.start();
 }
@@ -197,21 +197,19 @@ export function start() {
  * @param {number} row
  * @param {number} col
  * @param {number} space
+ * @param {MazeType} maze
  */
-export function draw_maze(from_x, from_y, row, col, space) {
-    wasm.draw_maze(from_x, from_y, row, col, space);
+export function draw_maze(from_x, from_y, row, col, space, maze) {
+    wasm.draw_maze(from_x, from_y, row, col, space, maze);
 }
 
 /**
- * @param {number} from_x
- * @param {number} from_y
- * @param {number} row
- * @param {number} col
- * @param {number} space
+ * @enum {0 | 1}
  */
-export function draw_single_stroke_maze(from_x, from_y, row, col, space) {
-    wasm.draw_single_stroke_maze(from_x, from_y, row, col, space);
-}
+export const MazeType = Object.freeze({
+    Random: 0, "0": "Random",
+    SingleStroke: 1, "1": "SingleStroke",
+});
 
 export function __wbg_beginPath_e90b8acd21368182(arg0) {
     arg0.beginPath();
@@ -241,21 +239,21 @@ export function __wbg_crypto_574e78ad8b13b65f(arg0) {
     return ret;
 };
 
+export function __wbg_debug_103948ed4c500577(arg0, arg1, arg2, arg3) {
+    console.debug(arg0, arg1, arg2, arg3);
+};
+
 export function __wbg_document_62abd3e2b80cbd9e(arg0) {
     const ret = arg0.document;
     return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
 };
 
-export function __wbg_error_7534b8e9a36f1ab4(arg0, arg1) {
-    let deferred0_0;
-    let deferred0_1;
-    try {
-        deferred0_0 = arg0;
-        deferred0_1 = arg1;
-        console.error(getStringFromWasm0(arg0, arg1));
-    } finally {
-        wasm.__wbindgen_free(deferred0_0, deferred0_1, 1);
-    }
+export function __wbg_error_51ecdd39ec054205(arg0) {
+    console.error(arg0);
+};
+
+export function __wbg_error_624160881466fd69(arg0, arg1, arg2, arg3) {
+    console.error(arg0, arg1, arg2, arg3);
 };
 
 export function __wbg_getContext_7413c456eda278ca() { return handleError(function (arg0, arg1, arg2) {
@@ -271,6 +269,10 @@ export function __wbg_getElementById_6cd98fa4e2fb8b6b(arg0, arg1, arg2) {
 export function __wbg_getRandomValues_b8f5dbd5f3995a9e() { return handleError(function (arg0, arg1) {
     arg0.getRandomValues(arg1);
 }, arguments) };
+
+export function __wbg_info_a1cc312ecc877319(arg0, arg1, arg2, arg3) {
+    console.info(arg0, arg1, arg2, arg3);
+};
 
 export function __wbg_instanceof_CanvasRenderingContext2d_19ef0ce01d5372e5(arg0) {
     let result;
@@ -309,8 +311,8 @@ export function __wbg_lineTo_ee7420b06f5649f8(arg0, arg1, arg2) {
     arg0.lineTo(arg1, arg2);
 };
 
-export function __wbg_log_ea240990d83e374e(arg0) {
-    console.log(arg0);
+export function __wbg_log_bff357b3df4db934(arg0, arg1, arg2, arg3) {
+    console.log(arg0, arg1, arg2, arg3);
 };
 
 export function __wbg_moveTo_f6c695699134b5bf(arg0, arg1, arg2) {
@@ -319,11 +321,6 @@ export function __wbg_moveTo_f6c695699134b5bf(arg0, arg1, arg2) {
 
 export function __wbg_msCrypto_a61aeb35a24c1329(arg0) {
     const ret = arg0.msCrypto;
-    return ret;
-};
-
-export function __wbg_new_8a6f238a6ece86ea() {
-    const ret = new Error();
     return ret;
 };
 
@@ -361,10 +358,6 @@ export function __wbg_randomFillSync_ac0988aba3254290() { return handleError(fun
     arg0.randomFillSync(arg1);
 }, arguments) };
 
-export function __wbg_rect_fa86c049c4f17223(arg0, arg1, arg2, arg3, arg4) {
-    arg0.rect(arg1, arg2, arg3, arg4);
-};
-
 export function __wbg_require_60cc747a6bc5215a() { return handleError(function () {
     const ret = module.require;
     return ret;
@@ -372,14 +365,6 @@ export function __wbg_require_60cc747a6bc5215a() { return handleError(function (
 
 export function __wbg_set_fe4e79d1ed3b0e9b(arg0, arg1, arg2) {
     arg0.set(arg1, arg2 >>> 0);
-};
-
-export function __wbg_stack_0ed75d68575b0f3c(arg0, arg1) {
-    const ret = arg1.stack;
-    const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
-    getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
 };
 
 export function __wbg_static_accessor_GLOBAL_487c52c58d65314d() {
@@ -414,6 +399,10 @@ export function __wbg_subarray_dd4ade7d53bd8e26(arg0, arg1, arg2) {
 export function __wbg_versions_c01dfd4722a88165(arg0) {
     const ret = arg0.versions;
     return ret;
+};
+
+export function __wbg_warn_90607373221a6b1c(arg0, arg1, arg2, arg3) {
+    console.warn(arg0, arg1, arg2, arg3);
 };
 
 export function __wbindgen_debug_string(arg0, arg1) {
