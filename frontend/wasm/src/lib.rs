@@ -8,7 +8,8 @@ use crate::maze::{random_maze, single_stroke_maze};
 
 #[wasm_bindgen(start)]
 pub fn start() {
-    wasm_logger::init(wasm_logger::Config::new(log::Level::Error));
+    console_error_panic_hook::set_once();
+    wasm_logger::init(wasm_logger::Config::new(log::Level::Debug));
 }
 
 #[wasm_bindgen]
@@ -46,7 +47,10 @@ pub fn draw_maze(
     ctx.begin_path();
 
     match maze {
-        MazeType::Random => random_maze::draw_maze(&ctx, col, row, space),
+        MazeType::Random => {
+            ctx.rect(0.0, 0.0, width, height);
+            random_maze::draw_maze(&ctx, col, row, space)
+        },
         MazeType::SingleStroke => {
             single_stroke_maze::draw_maze(&ctx, col, row, space);
         }

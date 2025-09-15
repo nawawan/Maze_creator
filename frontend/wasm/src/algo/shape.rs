@@ -1,6 +1,5 @@
 use std::{
-    ops::{Add, Mul, Sub},
-    process::Output,
+    ops::{Add, Mul, Sub}
 };
 
 use web_sys::CanvasRenderingContext2d;
@@ -35,6 +34,12 @@ impl Point<usize> {
             x: idx / width,
             y: idx % width,
         }
+    }
+    pub fn shift_horizontal(&mut self){
+        self.y += 1;
+    }
+    pub fn shift_vertical(&mut self) {
+        self.x += 1;
     }
 }
 

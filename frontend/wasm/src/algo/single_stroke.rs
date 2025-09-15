@@ -60,7 +60,6 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(Point<usi
     let size = w * h;
     let mut used_grid = vec![false; size];
     for (start, end) in edges.iter() {
-        log::debug!("flatten start = {}, flatten end = {}, size = {}", start.flatten(w), end.flatten(w), size);
         used_grid[start.flatten(w)] = true;
         used_grid[end.flatten(w)] = true;
     }
