@@ -6,7 +6,7 @@ enum Offset {
     Zero,
 }
 
-const BIG_NUM: usize = 1000000000;
+const BIG_NUM: usize = 100000;
 
 pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(Point<usize>, Point<usize>)> {
     width -= 1;
@@ -27,14 +27,18 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(Point<usi
 
     let mut random_bytes = [0u8; 1];
     getrandom::getrandom(&mut random_bytes).unwrap();
-    let offset = match u8::from_ne_bytes(random_bytes) % 2 {
+    let modulo = u8::from_ne_bytes(random_bytes) % 2;
+    let offset = match modulo {
         0 => Offset::Zero,
         1 => Offset::One,
-        _ => panic!("impossible value"),
+        _ => {
+            log::error!("impossible value, offset = {}", modulo);
+            panic!();
+        },
     };
 
     if width % 2 == 0 {
-        shift_horizontal(&mut used_grid_edges, width - 1, height, step, offset);
+        shift_horizontal(&mut used_grid_edges, width, height, step, offset);
     } else if height % 2 == 0 {
         shift_vertical(&mut used_grid_edges, width, height, step, offset);
     }
@@ -56,11 +60,13 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(Point<usi
     let size = w * h;
     let mut used_grid = vec![false; size];
     for (start, end) in edges.iter() {
+        log::debug!("flatten start = {}, flatten end = {}, size = {}", start.flatten(w), end.flatten(w), size);
         used_grid[start.flatten(w)] = true;
         used_grid[end.flatten(w)] = true;
     }
-    let mut queue = VecDeque::new();
 
+    log::info!("single stroke. create outer perimeter");
+    let mut queue = VecDeque::new();
     let dx: [i32; 4] = [0, 1, 0, -1];
     let dy: [i32; 4] = [1, 0, -1, 0];
     queue.push_front(0);
@@ -87,6 +93,7 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(Point<usi
     edges
 }
 
+// 与えられたPointのタプル間の線分を、step個に区切って新たなPointのタプルとして返す
 fn divide_edges(
     lines: &Vec<(Point<usize>, Point<usize>)>,
     step: usize,
@@ -100,16 +107,21 @@ fn divide_edges(
             swap(&mut from, &mut to);
         }
         let interval = (to - from) / step;
+        log::debug!("from: (x, y) = ({}, {}), to: (x, y) = ({}, {}), interval = {}", start.x, start.y, end.x, end.y, interval);
         for line_begin in (from..to).step_by(interval) {
             edges.push((
                 Point::<usize>::from_1d_index(line_begin, width),
                 Point::<usize>::from_1d_index(line_begin + interval, width),
             ));
+            let p = Point::<usize>::from_1d_index(line_begin, width);
+            let q = Point::<usize>::from_1d_index(line_begin + interval, width);
+            log::debug!("start x, y = {}, {}, end x, y = {}, {}", p.x, p.y, q.x, q.y);
         }
     }
     edges
 }
 
+// 二次元座標中に存在する線分を、水平方向に+1移動させる
 fn shift_horizontal(
     edges: &mut Vec<(Point<usize>, Point<usize>)>,
     width: usize,
@@ -135,6 +147,7 @@ fn shift_horizontal(
     }
 }
 
+// 二次元座標中に存在する線分を、垂直s方向に+1移動させる
 fn shift_vertical(
     edges: &mut Vec<(Point<usize>, Point<usize>)>,
     width: usize,
