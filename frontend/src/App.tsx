@@ -94,9 +94,9 @@ function App() {
     canvas.width = width;
     canvas.height = height;
     if (m === "single") {
-      draw_maze(0, 0, rows, cols, cellSize, MazeType.Random);
-    } else {
       draw_maze(0, 0, rows, cols, cellSize, MazeType.SingleStroke);
+    } else {
+      draw_maze(0, 0, rows, cols, cellSize, MazeType.Random);
     }
   };
 
