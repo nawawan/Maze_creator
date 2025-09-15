@@ -10,6 +10,7 @@ pub fn validate(row: usize, col: usize, space: f64) -> bool {
 }
 
 pub fn draw_maze(ctx: &CanvasRenderingContext2d, width: usize, height: usize, space: f64) {
+    log::debug!("{}", format!("create random maze in width: {}, height: {}, space: {}", width, height, space));
     let unused_vertex = kruskal::extract_maze_edges_by_kruskal(
         width,
         height,
@@ -17,9 +18,7 @@ pub fn draw_maze(ctx: &CanvasRenderingContext2d, width: usize, height: usize, sp
         kruskal::KruskalResultEdge::Unused,
     );
 
-    for (node_left, node_right) in unused_vertex {
-        let from = grid::index_1d_to_2d(node_left, width);
-        let to = grid::index_1d_to_2d(node_right, width);
+    for (from, to) in unused_vertex {
         set_grid_boundary(&ctx, from, to, space);
     }
 }
