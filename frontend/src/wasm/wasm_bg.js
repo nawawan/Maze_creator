@@ -192,15 +192,15 @@ export function start() {
 }
 
 /**
- * @param {number} from_x
- * @param {number} from_y
+ * @param {number} left_top_x
+ * @param {number} left_top_y
  * @param {number} row
  * @param {number} col
  * @param {number} space
  * @param {MazeType} maze
  */
-export function draw_maze(from_x, from_y, row, col, space, maze) {
-    wasm.draw_maze(from_x, from_y, row, col, space, maze);
+export function draw_maze(left_top_x, left_top_y, row, col, space, maze) {
+    wasm.draw_maze(left_top_x, left_top_y, row, col, space, maze);
 }
 
 /**
@@ -357,6 +357,10 @@ export function __wbg_process_dc0fbacc7c1c06f7(arg0) {
 export function __wbg_randomFillSync_ac0988aba3254290() { return handleError(function (arg0, arg1) {
     arg0.randomFillSync(arg1);
 }, arguments) };
+
+export function __wbg_rect_fa86c049c4f17223(arg0, arg1, arg2, arg3, arg4) {
+    arg0.rect(arg1, arg2, arg3, arg4);
+};
 
 export function __wbg_require_60cc747a6bc5215a() { return handleError(function () {
     const ret = module.require;
