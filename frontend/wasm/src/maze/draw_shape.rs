@@ -30,10 +30,20 @@ pub fn set_grid_boundary(
     space: f64,
 ) {
     if from.x == to.x {
-        set_line_between_grid(ctx, Point::new(from.x, to.y), Point::new(to.x + 1, to.y), space);
+        set_line_between_grid(
+            ctx,
+            Point::new(from.x, to.y),
+            Point::new(to.x + 1, to.y),
+            space,
+        );
     }
     if from.y == to.y {
-        set_line_between_grid(ctx, Point::new(to.x, from.y), Point::new(to.x, to.y + 1), space);
+        set_line_between_grid(
+            ctx,
+            Point::new(to.x, from.y),
+            Point::new(to.x, to.y + 1),
+            space,
+        );
     }
 }
 

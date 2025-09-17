@@ -1,7 +1,6 @@
-use web_sys::{CanvasRenderingContext2d};
+use web_sys::CanvasRenderingContext2d;
 
 use crate::{algo::single_stroke, maze::draw_shape::draw_lines};
-
 
 pub fn validate(row: usize, col: usize, space: f64) -> bool {
     if row == 0 || col == 0 || !space.is_finite() || space <= 0.0 {
@@ -18,7 +17,13 @@ pub fn validate(row: usize, col: usize, space: f64) -> bool {
 }
 
 pub fn draw_maze(ctx: &CanvasRenderingContext2d, width: usize, height: usize, space: f64) {
-    log::debug!("{}", format!("create single stroke maze in width: {}, height: {}, space: {}", width, height, space));
+    log::debug!(
+        "{}",
+        format!(
+            "create single stroke maze in width: {}, height: {}, space: {}",
+            width, height, space
+        )
+    );
     let edges = single_stroke::single_stroke_maze(width, height);
     draw_lines(ctx, edges, space);
 }
