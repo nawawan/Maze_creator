@@ -32,7 +32,6 @@ pub fn single_stroke_maze(
         true => Offset::One,
     };
 
-    log::debug!("{}", modulo);
 
     if width % 2 == 0 {
         shift_horizontal(&mut used_grid_line, width, offset);
@@ -209,7 +208,10 @@ fn get_random_bool() -> bool {
     let mut random_bytes = [0u8; 1];
     match getrandom::getrandom(&mut random_bytes) {
         Ok(_) => u8::from_ne_bytes(random_bytes) % 2 == 1,
-        Err(_) => false,
+        Err(_) => {
+            log::warn!("get_randome failed, so return false");
+            false
+        },
     }
 }
 
