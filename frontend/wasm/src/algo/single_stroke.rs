@@ -1,6 +1,7 @@
 use crate::algo::{kruskal, shape::Point};
 use std::{collections::VecDeque, mem::swap};
 
+#[derive(Clone, Copy)]
 enum Offset {
     One,
     Zero,
@@ -8,7 +9,10 @@ enum Offset {
 
 const BIG_NUM: usize = 100000;
 
-pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(Point<usize>, Point<usize>)> {
+pub fn single_stroke_maze(
+    mut width: usize,
+    mut height: usize,
+) -> Vec<(Point<usize>, Point<usize>)> {
     width -= 1;
     height -= 1;
     if width % 2 == 0 && height % 2 == 0 {
@@ -22,38 +26,36 @@ pub fn single_stroke_maze(mut width: usize, mut height: usize) -> Vec<(Point<usi
         step,
         kruskal::KruskalResultEdge::Used,
     );
+    let modulo = get_random_bool();
+    let offset = match modulo {
+        false => Offset::Zero,
+        true => Offset::One,
+    };
+
+
+    if width % 2 == 0 {
+        shift_horizontal(&mut used_grid_line, width, offset);
+    } else if height % 2 == 0 {
+        shift_vertical(&mut used_grid_line, height, offset);
+    }
 
     let mut used_grid_edges = divide_edges(&mut used_grid_line, step);
 
-    let mut random_bytes = [0u8; 1];
-    getrandom::getrandom(&mut random_bytes).unwrap();
-    let modulo = u8::from_ne_bytes(random_bytes) % 2;
-    let offset = match modulo {
-        0 => Offset::Zero,
-        1 => Offset::One,
-        _ => {
-            log::error!("impossible value, offset = {}", modulo);
-            panic!();
-        },
-    };
-
     if width % 2 == 0 {
-        shift_horizontal(&mut used_grid_edges, width, height, step, offset);
+        add_end_horizontal(&mut used_grid_edges, width, height, step, offset);
     } else if height % 2 == 0 {
-        shift_vertical(&mut used_grid_edges, width, height, step, offset);
+        add_end_vertical(&mut used_grid_edges, width, height, step, offset);
     }
 
     let w = width + 2;
     let h = height + 2;
 
-    used_grid_edges
-        .iter_mut()
-        .for_each(|(start, end)| {
-                start.shift_horizontal();
-                start.shift_vertical();
-                end.shift_horizontal();
-                end.shift_vertical();
-        });
+    used_grid_edges.iter_mut().for_each(|(start, end)| {
+        start.shift_horizontal();
+        start.shift_vertical();
+        end.shift_horizontal();
+        end.shift_vertical();
+    });
 
     let mut edges = used_grid_edges;
 
@@ -106,22 +108,39 @@ fn divide_edges(
             swap(&mut from, &mut to);
         }
         let interval = (to - from) / step;
-        log::debug!("from: (x, y) = ({}, {}), to: (x, y) = ({}, {}), interval = {}", start.x, start.y, end.x, end.y, interval);
         for line_begin in (from..to).step_by(interval) {
             edges.push((
                 Point::<usize>::from_1d_index(line_begin, width),
                 Point::<usize>::from_1d_index(line_begin + interval, width),
             ));
-            let p = Point::<usize>::from_1d_index(line_begin, width);
-            let q = Point::<usize>::from_1d_index(line_begin + interval, width);
-            log::debug!("start x, y = {}, {}, end x, y = {}, {}", p.x, p.y, q.x, q.y);
         }
     }
     edges
 }
 
 // 二次元座標中に存在する線分を、水平方向に+1移動させる
-fn shift_horizontal(
+fn shift_horizontal(edges: &mut Vec<(Point<usize>, Point<usize>)>, width: usize, offset: Offset) {
+    match offset {
+        Offset::Zero => {
+            edges.iter_mut().for_each(|(x, y)| {
+                if x.y == y.y && x.y == width - 2 && get_random_bool() {
+                    x.shift_horizontal();
+                    y.shift_horizontal();
+                }
+            });
+        }
+        Offset::One => {
+            edges.iter_mut().for_each(|(x, y)| {
+                if !(x.y == y.y && x.y == 0 && get_random_bool()) {
+                    x.shift_horizontal();
+                    y.shift_horizontal();
+                }
+            });
+        }
+    }
+}
+
+fn add_end_horizontal(
     edges: &mut Vec<(Point<usize>, Point<usize>)>,
     width: usize,
     height: usize,
@@ -131,14 +150,10 @@ fn shift_horizontal(
     match offset {
         Offset::Zero => {
             for row in (0..height).step_by(step) {
-                edges.push((Point::new(row, width - 1), Point::new(row, width)));
+                edges.push((Point::new(row, width - 2), Point::new(row, width - 1)));
             }
         }
         Offset::One => {
-            edges.iter_mut().for_each(|(x, y)| {
-                x.shift_horizontal();
-                y.shift_horizontal();
-            });
             for row in (0..height).step_by(step) {
                 edges.push((Point::new(row, 0), Point::new(row, 1)));
             }
@@ -147,7 +162,28 @@ fn shift_horizontal(
 }
 
 // 二次元座標中に存在する線分を、垂直s方向に+1移動させる
-fn shift_vertical(
+fn shift_vertical(edges: &mut Vec<(Point<usize>, Point<usize>)>, height: usize, offset: Offset) {
+    match offset {
+        Offset::Zero => {
+            edges.iter_mut().for_each(|(x, y)| {
+                if x.x == y.x && x.x == height - 2 && get_random_bool() {
+                    x.shift_vertical();
+                    y.shift_vertical();
+                }
+            });
+        }
+        Offset::One => {
+            edges.iter_mut().for_each(|(x, y)| {
+                if !(x.x == y.x && x.x == 0 && get_random_bool()) {
+                    x.shift_vertical();
+                    y.shift_vertical();
+                }
+            });
+        }
+    }
+}
+
+fn add_end_vertical(
     edges: &mut Vec<(Point<usize>, Point<usize>)>,
     width: usize,
     height: usize,
@@ -157,18 +193,25 @@ fn shift_vertical(
     match offset {
         Offset::Zero => {
             for col in (0..width).step_by(step) {
-                edges.push((Point::new(height - 1, col), Point::new(height, col)));
+                edges.push((Point::new(height - 2, col), Point::new(height - 1, col)));
             }
         }
         Offset::One => {
-            edges.iter_mut().for_each(|(x, y)| {
-                x.shift_vertical();
-                y.shift_vertical();
-            });
             for col in (0..width).step_by(step) {
                 edges.push((Point::new(0, col), Point::new(1, col)));
             }
         }
+    }
+}
+
+fn get_random_bool() -> bool {
+    let mut random_bytes = [0u8; 1];
+    match getrandom::getrandom(&mut random_bytes) {
+        Ok(_) => u8::from_ne_bytes(random_bytes) % 2 == 1,
+        Err(_) => {
+            log::warn!("get_randome failed, so return false");
+            false
+        },
     }
 }
 
