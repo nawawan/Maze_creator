@@ -2,7 +2,7 @@ use std::ops::{Add, Mul, Sub};
 
 use web_sys::CanvasRenderingContext2d;
 
-#[derive(Hash, Eq, PartialEq)]
+#[derive(Hash, Eq, PartialEq, Clone, Copy)]
 pub struct Point<T> {
     pub x: T,
     pub y: T,
