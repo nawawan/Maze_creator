@@ -35,6 +35,11 @@ const MazeType = {
   Random: 0,
   SingleStroke: 1,
 };
+const Wall = {
+  Some: true,
+  None: false,
+}
+
 type Mode = "random" | "single";
 
 function App() {
@@ -95,12 +100,13 @@ function App() {
     // キャンバスサイズをグリッドに合わせる
     const width = cellSize * cols;
     const height = cellSize * rows;
+    const wallExistence = Wall.Some;
     canvas.width = width;
     canvas.height = height;
     if (m === "single") {
-      draw_maze(0, 0, rows, cols, cellSize, MazeType.SingleStroke);
+      draw_maze(0, 0, rows, cols, cellSize, MazeType.SingleStroke, wallExistence);
     } else {
-      draw_maze(0, 0, rows, cols, cellSize, MazeType.Random);
+      draw_maze(0, 0, rows, cols, cellSize, MazeType.Random, wallExistence);
     }
   };
 

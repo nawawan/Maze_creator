@@ -30,10 +30,14 @@ pub fn start() {
     wasm_logger::init(wasm_logger::Config::new(level));
 }
 
-#[wasm_bindgen]
-pub enum MazeType {
+enum MazeType {
     Random,
     SingleStroke,
+}
+
+enum WallExistence {
+    Some,
+    None,
 }
 
 #[wasm_bindgen]
@@ -44,6 +48,7 @@ pub fn draw_maze(
     col: usize,
     space: f64,
     maze_type: u32,
+    wall: bool,
 ) {
     let maze: MazeType = match maze_type {
         0 => MazeType::Random,
@@ -52,6 +57,10 @@ pub fn draw_maze(
             log::error!("invalid maze type is selected");
             MazeType::Random
         },
+    };
+    let wall: WallExistence = match wall {
+        true => WallExistence::Some,
+        false => WallExistence::None,
     };
     let validated_input = match maze {
         MazeType::Random => random_maze::validate(row, col, space),
@@ -75,7 +84,7 @@ pub fn draw_maze(
     match maze {
         MazeType::Random => {
             ctx.rect(0.0, 0.0, width, height);
-            random_maze::draw_maze(&ctx, col, row, space)
+            random_maze::draw_maze(&ctx, col, row, space, wall)
         }
         MazeType::SingleStroke => {
             single_stroke_maze::draw_maze(&ctx, col, row, space);
