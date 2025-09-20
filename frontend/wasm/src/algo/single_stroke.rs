@@ -59,38 +59,8 @@ pub fn single_stroke_maze(
 
     let mut edges = used_grid_edges;
 
-    let size = w * h;
-    let mut used_grid = vec![false; size];
-    for (start, end) in edges.iter() {
-        used_grid[start.flatten(w)] = true;
-        used_grid[end.flatten(w)] = true;
-    }
-
     log::info!("single stroke. create outer perimeter");
-    let mut queue = VecDeque::new();
-    let dx: [i32; 4] = [0, 1, 0, -1];
-    let dy: [i32; 4] = [1, 0, -1, 0];
-    queue.push_front(0);
-    while let Some(v) = queue.pop_front() {
-        if used_grid[v] {
-            continue;
-        }
-        used_grid[v] = true;
-        let x = v / w;
-        let y = v % w;
-        for i in 0..4 {
-            let nx = x as i32 + dx[i];
-            let ny = y as i32 + dy[i];
-            if 0 <= nx && nx < h as i32 && 0 <= ny && ny < w as i32 {
-                let nv = w * nx as usize + ny as usize;
-                if used_grid[nv] {
-                    continue;
-                }
-                edges.push((Point::from_1d_index(v, w), Point::from_1d_index(nv, w)));
-                queue.push_back(nv);
-            }
-        }
-    }
+    push_rest_edges(&mut edges, w, h);
     edges
 }
 
@@ -213,6 +183,44 @@ fn get_random_bool() -> bool {
             false
         },
     }
+}
+
+fn push_rest_edges(edges: &mut Vec<(Point<usize>, Point<usize>)>, width: usize, height: usize) {
+    let mut used_grid = used_grid(edges, width, height);
+    let mut queue = VecDeque::new();
+    let dx: [i32; 4] = [0, 1, 0, -1];
+    let dy: [i32; 4] = [1, 0, -1, 0];
+    queue.push_front(0);
+    while let Some(v) = queue.pop_front() {
+        if used_grid[v] {
+            continue;
+        }
+        used_grid[v] = true;
+        let x = v / width;
+        let y = v % width;
+        for i in 0..4 {
+            let nx = x as i32 + dx[i];
+            let ny = y as i32 + dy[i];
+            if 0 <= nx && nx < height as i32 && 0 <= ny && ny < width as i32 {
+                let nv = width * nx as usize + ny as usize;
+                if used_grid[nv] {
+                    continue;
+                }
+                edges.push((Point::from_1d_index(v, width), Point::from_1d_index(nv, width)));
+                queue.push_back(nv);
+            }
+        }
+    }
+}
+
+fn used_grid(edges: &Vec<(Point<usize>, Point<usize>)>,width: usize, height: usize) -> Vec<bool> {
+    let size = width * height;
+    let mut used_grid = vec![false; size];
+    for (start, end) in edges.iter() {
+        used_grid[start.flatten(width)] = true;
+        used_grid[end.flatten(width)] = true;
+    }
+    used_grid
 }
 
 // #[cfg(test)]
