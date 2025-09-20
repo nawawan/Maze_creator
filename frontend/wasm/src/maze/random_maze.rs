@@ -1,7 +1,7 @@
 use web_sys::CanvasRenderingContext2d;
 
 use crate::{
-    algo::{grid, kruskal},
+    algo::{kruskal},
     maze::draw_shape::set_grid_boundary,
 };
 

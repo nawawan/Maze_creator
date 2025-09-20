@@ -43,8 +43,16 @@ pub fn draw_maze(
     row: usize,
     col: usize,
     space: f64,
-    maze: MazeType,
+    maze_type: u32,
 ) {
+    let maze: MazeType = match maze_type {
+        0 => MazeType::Random,
+        1 => MazeType::SingleStroke,
+        _ => {
+            log::error!("invalid maze type is selected");
+            MazeType::Random
+        },
+    };
     let validated_input = match maze {
         MazeType::Random => random_maze::validate(row, col, space),
         MazeType::SingleStroke => single_stroke_maze::validate(row, col, space),
