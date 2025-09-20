@@ -87,7 +87,7 @@ pub fn draw_maze(
             random_maze::draw_maze(&ctx, col, row, space, wall)
         }
         MazeType::SingleStroke => {
-            single_stroke_maze::draw_maze(&ctx, col, row, space);
+            single_stroke_maze::draw_maze(&ctx, col, row, space, wall);
         }
     };
     ctx.stroke();
