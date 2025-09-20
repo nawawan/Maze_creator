@@ -197,10 +197,10 @@ export function start() {
  * @param {number} row
  * @param {number} col
  * @param {number} space
- * @param {MazeType} maze
+ * @param {number} maze_type
  */
-export function draw_maze(left_top_x, left_top_y, row, col, space, maze) {
-    wasm.draw_maze(left_top_x, left_top_y, row, col, space, maze);
+export function draw_maze(left_top_x, left_top_y, row, col, space, maze_type) {
+    wasm.draw_maze(left_top_x, left_top_y, row, col, space, maze_type);
 }
 
 /**
