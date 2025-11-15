@@ -37,7 +37,9 @@ jobs:
         with:
           path: |
             ~/.cargo/registry
-            ~/.cargo/git
+          key: rust-${{ hashfiles('frontend/wasm/Cargo.lock') }}
+          restore-keys: |
+            rust-
       - name: Run tests
         run: cd frontend/wasm32 && cargo test
   build:
@@ -50,7 +52,9 @@ jobs:
         with:
           path: |
             ~/.cargo/registry
-            ~/.cargo/git
+          key: rust-${{ hashfiles('frontend/wasm/Cargo.lock') }}
+          restore-keys: |
+            rust-
       - run: LOG_LEVEL=Info wasm-pack build --target bundler --out-dir ../src/wasm
       - name: build
         uses: actions/setup-node@v4
