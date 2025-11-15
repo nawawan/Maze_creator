@@ -21,12 +21,12 @@ jobs:
         with:
           toolchain: stable
           profile: minimal
-        run: rustup target add wasm32-unknown-unknown
-        run: cargo install wasm-pack
+      - run: rustup target add wasm32-unknown-unknown
+      - run: cargo install wasm-pack
       - name: Run linter
-        run: cd frontend
-        run: npm run lint
-        run : cd wasm && cargo fmt -- --check
+        run: cd frontend && npm run linter
+      - name: Run rustfmt
+        run: cd wasm && cargo fmt -- --check
   test:
     runs-on: ubuntu-latest
     steps:
@@ -39,8 +39,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
       - name: Run tests
-        run: cd frontend/wasm32
-        run: cargo test
+        run: cd frontend/wasm32 && cargo test
   build:
     runs-on: [ubuntu-latest]
     steps:
@@ -55,15 +54,13 @@ jobs:
       - run: LOG_LEVEL=Info wasm-pack build --target bundler --out-dir ../src/wasm
       - name: build
         uses: actions/setup-node@v4
-        run: npm install
-        run: npm run build
+        run: npm install && npm run build
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@2.0.0
         with:
