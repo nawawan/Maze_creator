@@ -101,6 +101,8 @@ jobs:
         with:
           name: maze-creator-frontend
           path: frontend
+      - run: cd frontend && ls
+      - run: ls
       - name: Deploy to Cloudflare Workers
         run: cd frontend && npm run preview
         env:
