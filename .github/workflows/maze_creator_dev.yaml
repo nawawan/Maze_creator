@@ -88,6 +88,8 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    environment:
+      name: cloudflare
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

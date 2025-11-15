@@ -88,6 +88,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    environment:
+      name: cloudflare
+      url: https://nawawan.com
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
