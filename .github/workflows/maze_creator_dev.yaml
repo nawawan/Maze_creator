@@ -32,7 +32,7 @@ jobs:
       - name: Run linter
         run: cd frontend && npm run lint
       - name: Run rustfmt
-        run: cd wasm && cargo fmt -- --check
+        run: cd frontend/wasm && cargo fmt -- --check
   test:
     needs: dependencies
     runs-on: ubuntu-latest
@@ -50,6 +50,7 @@ jobs:
       - name: Run tests
         run: cd frontend/wasm && cargo test
   build:
+    needs: [test, lint]
     runs-on: [ubuntu-latest]
     steps:
       - name: Checkout repository
@@ -70,8 +71,7 @@ jobs:
           key: npm-${{ hashfiles('**/package-lock.json') }}
           restore-keys: |
             npm-
-      - run: cargo install wasm-pack
-      - run: LOG_LEVEL=Info wasm-pack build --target bundler --out-dir ../src/wasm
+      - run: cd frontend/wasm && LOG_LEVEL=Info wasm-pack build --target bundler --out-dir ../src/wasm
       - name: build
         uses: actions/setup-node@v4
       - run: npm install && npm run build
