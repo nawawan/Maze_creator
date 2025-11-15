@@ -54,7 +54,7 @@ jobs:
       - run: LOG_LEVEL=Info wasm-pack build --target bundler --out-dir ../src/wasm
       - name: build
         uses: actions/setup-node@v4
-      - npm install && npm run build
+      - run: npm install && npm run build
   deploy:
     needs: build
     runs-on: ubuntu-latest
