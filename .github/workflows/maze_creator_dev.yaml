@@ -27,6 +27,7 @@ jobs:
       - name: Run rustfmt
         run: cd frontend/wasm && cargo fmt -- --check
   test:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
