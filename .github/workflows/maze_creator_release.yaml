@@ -20,7 +20,7 @@ jobs:
       - name: install cargo
         uses: dtolnay/rust-toolchain@stable
       - name: Rust cache
-        uses: Swaitnem/rust-cache@v2
+        uses: Swatinem/rust-cache@v2
       - run: cd frontend && npm ci
       - run: cd wasm && rustup target add wasm32-unknown-unknown
       - run: cargo install wasm-pack
@@ -47,7 +47,7 @@ jobs:
           restore-keys: |
             rust-
       - name: Run tests
-        run: cd frontend/wasm32 && cargo test
+        run: cd frontend/wasm && cargo test
   build:
     runs-on: [ubuntu-latest]
     steps:
