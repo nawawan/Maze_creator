@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 5173",
     "build": "tsc -b && vite build",
+    "deploy": "wrangler deploy --env production",
+    "preview": "wrangler deploy --env preview",
     "lint": "eslint .",
-    "preview": "vite preview",
     "formatter": "npx prettier ./src --write"
   },
   "dependencies": {
