@@ -2,8 +2,9 @@ name: Maze Creator CICD
 run-name: deploy maze-creator app to cloudflare workers
 on:
   workflow_dispatch:
-  branches:
-    - feature/*
+  push:
+    branches:
+      - feature/*
 
 jobs:
   lint:
