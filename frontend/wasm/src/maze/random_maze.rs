@@ -24,5 +24,7 @@ pub fn draw_maze(ctx: &CanvasRenderingContext2d, width: usize, height: usize, sp
     );
 
     let edges = extract_grid_boundary(&unused_vertex);
+
+    // let edges_in_wide_wall = expand_walls(edges);
     draw_lines(ctx, edges, space);
 }
