@@ -100,9 +100,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: maze-creator-frontend
-          path: frontend
-      - run: cd frontend && ls
-      - run: ls
+          path: frontend/dist
       - name: Deploy to Cloudflare Workers
         run: cd frontend && npm run preview
         env:

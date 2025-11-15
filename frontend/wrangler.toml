@@ -2,7 +2,7 @@ name = "maze-creator"
 compatibility_date = "2025-09-07"
 
 [assets]
-directory = "./maze-creator-frontend"
+directory = "./dist"
 
 [env.preview]
 workers_dev = true
