@@ -16,7 +16,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: 'npm'
       - name: install cargo
         uses: dtolnay/rust-toolchain@stable
       - name: Rust cache
@@ -25,6 +24,7 @@ jobs:
       - run: cd wasm && rustup target add wasm32-unknown-unknown
       - run: cargo install wasm-pack
   lint:
+    needs: dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -34,6 +34,7 @@ jobs:
       - name: Run rustfmt
         run: cd wasm && cargo fmt -- --check
   test:
+    needs: dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
