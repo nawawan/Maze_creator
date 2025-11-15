@@ -7,38 +7,33 @@ on:
     branches:
       - main
 jobs:
-  dependencies:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-      - name: install cargo
-        uses: dtolnay/rust-toolchain@stable
-      - name: Rust cache
-        uses: Swatinem/rust-cache@v2
-      - run: cd frontend && npm ci
-      - run: cd frontend/wasm && rustup target add wasm32-unknown-unknown
-      - run: cargo install wasm-pack
   lint:
     needs: dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: install cargo
+        uses: dtolnay/rust-toolchain@stable
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - run: cd frontend && npm ci
       - name: Run linter
         run: cd frontend && npm run lint
       - name: Run rustfmt
         run: cd frontend/wasm && cargo fmt -- --check
   test:
-    needs: dependencies
-    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: install cargo
+        uses: dtolnay/rust-toolchain@stable
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
       - name: Cache
         uses: actions/cache@v4
         with:
@@ -55,6 +50,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: install cargo
+        uses: dtolnay/rust-toolchain@stable
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
       - name: Cache
         uses: actions/cache@v4
         with:
@@ -71,20 +74,24 @@ jobs:
           key: npm-${{ hashfiles('**/package-lock.json') }}
           restore-keys: |
             npm-
+      - run: cd frontend/wasm && rustup target add wasm32-unknown-unknown && cargo install wasm-pack
       - run: cd frontend/wasm && LOG_LEVEL=Info wasm-pack build --target bundler --out-dir ../src/wasm
       - name: build
         uses: actions/setup-node@v4
-      - run: npm install && npm run build
+      - run: cd frontend && npm ci && npm run build
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
       - run: npm install wrangler -g
-      - run: cd frontend
       - name: Deploy to Cloudflare Workers
-        run: npm run preview
+        run: cd frontend && npm run preview
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID}}
