@@ -21,7 +21,7 @@ jobs:
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
       - run: cd frontend && npm ci
-      - run: cd wasm && rustup target add wasm32-unknown-unknown
+      - run: cd frontend/wasm && rustup target add wasm32-unknown-unknown
       - run: cargo install wasm-pack
   lint:
     needs: dependencies
