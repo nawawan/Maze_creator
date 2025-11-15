@@ -7,24 +7,35 @@ on:
       - feature/*
 
 jobs:
+  dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+        cache: npm
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+      - name: install cargo
+        uses: dtolnay/rust-toolchain@stable
+      - name: Rust cache
+        uses: Swaitnem/rust-cache@v1
+        with:
+          cache: cargo
+      - run: cd frontend && npm ci
+      - run: cd wasm && rustup target add wasm32-unknown-unknown
+      - run: cargo install wasm-pack
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-      - name: install cargo
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-      - run: rustup target add wasm32-unknown-unknown
-      - run: cargo install wasm-pack
       - name: Run linter
-        run: cd frontend && npm run linter
+        run: cd frontend && npm run lint
       - name: Run rustfmt
         run: cd wasm && cargo fmt -- --check
   test:
@@ -37,7 +48,7 @@ jobs:
         with:
           path: |
             ~/.cargo/registry
-          key: rust-${{ hashfiles('frontend/wasm/Cargo.lock') }}
+          key: rust-${{ hashfiles('**/Cargo.lock') }}
           restore-keys: |
             rust-
       - name: Run tests
@@ -55,6 +66,15 @@ jobs:
           key: rust-${{ hashfiles('frontend/wasm/Cargo.lock') }}
           restore-keys: |
             rust-
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+          key: npm-${{ hashfiles('**/package-lock.json') }}
+          restore-keys: |
+            npm-
+      - run: cargo install wasm-pack
       - run: LOG_LEVEL=Info wasm-pack build --target bundler --out-dir ../src/wasm
       - name: build
         uses: actions/setup-node@v4
@@ -65,6 +85,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - run: npm install wrangler -g
+      - run: cd frontend
       - name: Deploy to Cloudflare Workers
         run: npm run preview
         env:
