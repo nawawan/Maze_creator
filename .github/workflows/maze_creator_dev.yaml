@@ -6,26 +6,21 @@ on:
     branches:
       - feature/*
 
-jobs:
+jjobs:
   dependencies:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
-        cache: npm
-      - name: Cache Node.js modules
-        uses: actions/cache@v4
-        with:
+        cache: 'npm'
       - name: install cargo
         uses: dtolnay/rust-toolchain@stable
       - name: Rust cache
-        uses: Swaitnem/rust-cache@v1
-        with:
-          cache: cargo
+        uses: Swaitnem/rust-cache@v2
       - run: cd frontend && npm ci
       - run: cd wasm && rustup target add wasm32-unknown-unknown
       - run: cargo install wasm-pack
