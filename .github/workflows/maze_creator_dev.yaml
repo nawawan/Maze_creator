@@ -6,7 +6,7 @@ on:
     branches:
       - feature/*
 
-jjobs:
+jobs:
   dependencies:
     runs-on: ubuntu-latest
     steps:
@@ -16,7 +16,7 @@ jjobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-        cache: 'npm'
+          cache: 'npm'
       - name: install cargo
         uses: dtolnay/rust-toolchain@stable
       - name: Rust cache
