@@ -79,6 +79,12 @@ jobs:
       - name: build
         uses: actions/setup-node@v4
       - run: cd frontend && npm ci && npm run build
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maze-creator-frontend
+          path: frontend/dist
+          retention-days: 1
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -90,6 +96,10 @@ jobs:
         with:
           node-version: '22'
       - run: npm install wrangler -g
+      - name: Download artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: maze-creator-frontend
       - name: Deploy to Cloudflare Workers
         run: cd frontend && npm run preview
         env:
