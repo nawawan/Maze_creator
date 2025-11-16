@@ -3,3 +3,11 @@ compatibility_date = "2025-09-07"
 
 [assets]
 directory = "./dist"
+
+[env.preview]
+workers_dev = true
+
+
+[env.production]
+workers_dev = false
+routes = ["https://nawawan.com/*"]

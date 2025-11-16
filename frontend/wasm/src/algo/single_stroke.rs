@@ -32,7 +32,6 @@ pub fn single_stroke_maze(
         true => Offset::One,
     };
 
-
     if width % 2 == 0 {
         shift_horizontal(&mut used_grid_line, width, offset);
     } else if height % 2 == 0 {
@@ -181,7 +180,7 @@ fn get_random_bool() -> bool {
         Err(_) => {
             log::warn!("get_randome failed, so return false");
             false
-        },
+        }
     }
 }
 
