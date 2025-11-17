@@ -197,19 +197,12 @@ export function start() {
  * @param {number} row
  * @param {number} col
  * @param {number} space
- * @param {MazeType} maze
+ * @param {number} maze_type
+ * @param {boolean} wall
  */
-export function draw_maze(left_top_x, left_top_y, row, col, space, maze) {
-    wasm.draw_maze(left_top_x, left_top_y, row, col, space, maze);
+export function draw_maze(left_top_x, left_top_y, row, col, space, maze_type, wall) {
+    wasm.draw_maze(left_top_x, left_top_y, row, col, space, maze_type, wall);
 }
-
-/**
- * @enum {0 | 1}
- */
-export const MazeType = Object.freeze({
-    Random: 0, "0": "Random",
-    SingleStroke: 1, "1": "SingleStroke",
-});
 
 export function __wbg_beginPath_e90b8acd21368182(arg0) {
     arg0.beginPath();

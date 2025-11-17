@@ -23,28 +23,26 @@ pub fn set_line_between_grid(
     ctx.line_to(to.y, to.x);
 }
 
-pub fn set_grid_boundary(
-    ctx: &CanvasRenderingContext2d,
-    from: Point<usize>,
-    to: Point<usize>,
-    space: f64,
-) {
+pub fn extract_grid_boundary(
+    vertexes: &Vec<(Point<usize>, Point<usize>)>
+) -> Vec<(Point<usize>, Point<usize>)>{
+    let mut lines: Vec<(Point<usize>, Point<usize>)> = Vec::new();
+    for (from, to) in vertexes {
+        lines.push(grid_to_edge(from, to));
+    }
+    lines
+}
+
+fn grid_to_edge(from: &Point<usize>, to: &Point<usize>) -> (Point<usize>, Point<usize>){
     if from.x == to.x {
-        set_line_between_grid(
-            ctx,
-            Point::new(from.x, to.y),
-            Point::new(to.x + 1, to.y),
-            space,
-        );
+        return (Point::new(from.x, to.y), Point::new(to.x + 1, to.y))
     }
     if from.y == to.y {
-        set_line_between_grid(
-            ctx,
+        return (
             Point::new(to.x, from.y),
-            Point::new(to.x, to.y + 1),
-            space,
-        );
+            Point::new(to.x, to.y + 1));
     }
+    return (*from, *to);
 }
 
 pub fn draw_lines(

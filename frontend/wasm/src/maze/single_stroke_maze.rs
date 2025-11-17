@@ -1,6 +1,6 @@
 use web_sys::CanvasRenderingContext2d;
 
-use crate::{algo::single_stroke, maze::draw_shape::draw_lines};
+use crate::{algo::single_stroke, maze::draw_shape::draw_lines, WallExistence};
 
 pub fn validate(row: usize, col: usize, space: f64) -> bool {
     if row == 0 || col == 0 || !space.is_finite() || space <= 0.0 {
@@ -16,7 +16,7 @@ pub fn validate(row: usize, col: usize, space: f64) -> bool {
     return true;
 }
 
-pub fn draw_maze(ctx: &CanvasRenderingContext2d, width: usize, height: usize, space: f64) {
+pub fn draw_maze(ctx: &CanvasRenderingContext2d, width: usize, height: usize, space: f64, wall: WallExistence) {
     log::debug!(
         "{}",
         format!(

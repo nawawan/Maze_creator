@@ -2,7 +2,7 @@
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
 export const start: () => void;
-export const draw_maze: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
+export const draw_maze: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
 export const __wbindgen_exn_store: (a: number) => void;
 export const __externref_table_alloc: () => number;
 export const __wbindgen_export_2: WebAssembly.Table;
