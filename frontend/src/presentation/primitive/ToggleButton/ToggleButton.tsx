@@ -9,12 +9,14 @@ type ToggleButtonProps = {
     additionalContents?: string[]
 };
 
+const expandedContentId = "additional-contents-collapse";
+
 function ToggleButton(props: ToggleButtonProps) {
     const [isExpanded, setIsExpanded] = React.useState(false);
     const { displayText, additionalContents } = props;
 
     const handleToggle = () => {
-        setIsExpanded(!isExpanded);
+        setIsExpanded(isExpanded => !isExpanded);
     };
     return (
         <Box>
@@ -22,10 +24,12 @@ function ToggleButton(props: ToggleButtonProps) {
                 onClick={handleToggle}
                 sx = {{ width: '100%'}}
                 startIcon={isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                aria-expanded={isExpanded}
+                aria-controls={expandedContentId}
             >
                 {isExpanded ? "閉じる" : (displayText ?? "もっと見る")}
             </Button>
-            <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+            <Collapse id={expandedContentId} in={isExpanded} timeout="auto" unmountOnExit>
                 <Stack component="ul" spacing={1} sx={{ m: 0, p: 0 }}>
                 {additionalContents?.map((content) => (
                     <Box component="li" key={content} sx={{ listStyle: "none" }}>

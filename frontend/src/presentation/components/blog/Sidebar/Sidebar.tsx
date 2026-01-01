@@ -29,10 +29,10 @@ function Sidebar(props: SidebarProps) {
                         <Typography variant="body1">{year}</Typography>
                     </Box>
                 ))}
-                {additionalYears && 
-                    <ToggleButton additionalContents={additionalYears} />
-                }
             </Stack>
+            {additionalYears && 
+                <ToggleButton additionalContents={additionalYears} />
+            }
         </Stack>
     )
 };
