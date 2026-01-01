@@ -1,4 +1,4 @@
-FROM rust:1.89-bookworm
+FROM rust:1.89-busybox
 
 USER root
 

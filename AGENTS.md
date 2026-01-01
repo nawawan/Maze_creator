@@ -17,6 +17,7 @@
 - React components: PascalCase filenames (e.g., `GridCanvas.tsx`); hooks: `use*.ts`.
 - Utilities: `.ts` under `src/`; keep imports relative and tidy.
 - ESLint is configured (`eslint.config.js`) with TypeScript + React Hooks. Fix lint before pushing.
+- React coding: following React Coding style written in `docs/react-architecture.md`.
 
 ## Testing Guidelines
 - No formal test runner is configured yet. If adding tests, prefer Vitest + React Testing Library.

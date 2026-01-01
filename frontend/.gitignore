@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 .vite
 .env
+
+*storybook.log
+storybook-static
