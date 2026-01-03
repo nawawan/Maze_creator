@@ -1,4 +1,5 @@
 mod handler;
+mod service;
 
 use async_shutdown::ShutdownManager;
 use dotenv::dotenv;
@@ -12,7 +13,10 @@ use std::env;
 use tracing_subscriber;
 use tracing::info;
 
-use crate::handler::handle_blogs::*;
+use std::sync::Arc;
+
+use crate::handler::handler::*;
+use crate::service::service::*;
 
 #[tokio::main]
 async fn main() {
@@ -29,10 +33,12 @@ async fn main() {
         }
     });
 
+    let service = Arc::new(Service::new());
+
     let app = Router::new()
             .route("/", get(|| async { "Hello, World!" }))
             .route("/health", get(health_ok))
-            .nest("/api", create_blog_router())
+            .nest("/api", create_blog_router(service.clone()))
             .fallback(fallback);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.expect("error: failed to bind to address");
@@ -53,11 +59,12 @@ async fn main() {
     std::process::exit(exit_code);
 }
 
-fn create_blog_router() -> Router {
+fn create_blog_router(service: Arc<Service>) -> Router {
     Router::new()
-        .route("/blogs", get(get_blogs).post(|| async { "Blog posts" }))
+        .route("/blogs", get(Handler::get_blogs).post(|| async { "Blog posts" }))
         .route("/blogs/{id}", get(|| async { "Blog get by ID" }))
         .fallback(api_fallback)
+        .with_state(service)
 }
 
 async fn initialize_db() -> (Client, Connection<Socket, postgres_openssl::TlsStream<Socket>>) {
