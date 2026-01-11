@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Utc};
-
+use chrono::{DateTime, Months, NaiveDate, Utc};
+    
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Blog {
     pub id: u32,
@@ -10,7 +10,45 @@ pub struct Blog {
     pub deleted_at: Option<DateTime<Utc>>,
 }
 
+// impl TryFrom<Row> for Blog {
+//     type Error = Box<dyn std::error::Error>;
+
+//     fn try_from(row: Row) -> Result<Self, Self::Error> {
+//         Ok(Blog {
+//             id: row.get("id"),
+//             title: row.get("title")
+//         })
+//     }
+// }
+
 pub struct BlogFilter {
-    pub year: Option<i32>,
-    pub month: Option<u32>,
+    pub start: Option<DateTime<Utc>>,
+    pub end: Option<DateTime<Utc>>,
+}
+
+impl BlogFilter {
+    pub fn new(year: Option<&String>, month: Option<&String>) -> Self {
+        let (start, end) = converter_string_to_datetime(year, month);
+        Self { start, end }
+    }
+}
+
+fn converter_string_to_datetime(year: Option<&String>, month: Option<&String>) -> (Option<DateTime<Utc>>, Option<DateTime<Utc>>) {
+    if year.is_none() {
+       return (None, None);
+    }
+
+    let y = year.unwrap().parse::<i32>().unwrap();
+    let start = DateTime::from_naive_utc_and_offset(
+        NaiveDate::from_ymd_opt(y, 1, 1)
+            .unwrap()
+            .and_hms_opt(0, 0, 0)
+            .unwrap(), Utc);
+
+    if let Some(m) = month {
+        let month_num = m.parse::<u32>().unwrap();
+        return (start.checked_add_months(Months::new(month_num - 1)), start.checked_add_months(Months::new(month_num)));
+    }
+
+    (Some(start), start.checked_add_months(Months::new(12)))
 }
