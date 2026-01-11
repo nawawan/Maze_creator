@@ -1,12 +1,11 @@
-pub struct Service {
-}
+use crate::repository::repository::Repository;
 
-pub trait BlogService {
-    fn create_blog(&self);
+pub struct Service {
+    pub repository: Repository
 }
 
 impl Service {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(repository: Repository) -> Self {
+        Self { repository }
     }
 }
