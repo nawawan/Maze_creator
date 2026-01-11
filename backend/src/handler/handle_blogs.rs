@@ -6,7 +6,8 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use super::handler::Handler;
-use crate::service::service::{Service, BlogService};
+use crate::service::service::Service;
+use crate::service::blog_service::{BlogService};
 
 impl Handler {
     pub async fn get_blogs(Query(params): Query<HashMap<String, String>>, state: State<Arc<Service>>) -> Json<serde_json::Value> {
@@ -15,7 +16,7 @@ impl Handler {
 
         let service = state.0;
 
-        service.clone().create_blog();
+        service.clone().get_blogs(year, month);
 
         Json(serde_json::json!({
             "status": "success",
