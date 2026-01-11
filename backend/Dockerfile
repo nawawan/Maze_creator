@@ -1,4 +1,4 @@
-FROM rust-1.89.0-busybox AS builder
+FROM rust:1.92.0-alpine AS builder
 
 WORKDIR /usr/workspace/src
 
