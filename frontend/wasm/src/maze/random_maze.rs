@@ -1,15 +1,15 @@
 use web_sys::CanvasRenderingContext2d;
 
 use crate::{
-    algo::{grid, kruskal},
-    maze::draw_shape::set_grid_boundary,
+    algo::kruskal,
+    maze::draw_shape::{draw_lines, extract_grid_boundary}, WallExistence,
 };
 
 pub fn validate(row: usize, col: usize, space: f64) -> bool {
     return !(row == 0 || col == 0 || !space.is_finite() || space <= 0.0);
 }
 
-pub fn draw_maze(ctx: &CanvasRenderingContext2d, width: usize, height: usize, space: f64) {
+pub fn draw_maze(ctx: &CanvasRenderingContext2d, width: usize, height: usize, space: f64, wall: WallExistence) {
     log::info!(
         "create maze in width: {}, height: {}, space: {}",
         width,
@@ -23,7 +23,8 @@ pub fn draw_maze(ctx: &CanvasRenderingContext2d, width: usize, height: usize, sp
         kruskal::KruskalResultEdge::Unused,
     );
 
-    for (from, to) in unused_vertex {
-        set_grid_boundary(&ctx, from, to, space);
-    }
+    let edges = extract_grid_boundary(&unused_vertex);
+
+    // let edges_in_wide_wall = expand_walls(edges);
+    draw_lines(ctx, edges, space);
 }

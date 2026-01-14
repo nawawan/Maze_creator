@@ -22,7 +22,7 @@ import Grid from "@mui/material/Grid";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
-import { draw_maze, MazeType} from "./wasm";
+import { draw_maze } from "./wasm";
 
 type GridParams = {
   cellSize: number; // 1マスの幅（px）
@@ -31,6 +31,15 @@ type GridParams = {
 };
 
 const DEFAULT_PARAMS: GridParams = { cellSize: 20, cols: 15, rows: 10 };
+const MazeType = {
+  Random: 0,
+  SingleStroke: 1,
+};
+const Wall = {
+  Some: true,
+  None: false,
+}
+
 type Mode = "random" | "single";
 
 function App() {
@@ -91,12 +100,13 @@ function App() {
     // キャンバスサイズをグリッドに合わせる
     const width = cellSize * cols;
     const height = cellSize * rows;
+    const wallExistence = Wall.Some;
     canvas.width = width;
     canvas.height = height;
     if (m === "single") {
-      draw_maze(0, 0, rows, cols, cellSize, MazeType.SingleStroke);
+      draw_maze(0, 0, rows, cols, cellSize, MazeType.SingleStroke, wallExistence);
     } else {
-      draw_maze(0, 0, rows, cols, cellSize, MazeType.Random);
+      draw_maze(0, 0, rows, cols, cellSize, MazeType.Random, wallExistence);
     }
   };
 

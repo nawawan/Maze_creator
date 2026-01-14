@@ -1,4 +1,5 @@
 use web_sys::CanvasRenderingContext2d;
+use std::{collections::HashSet};
 
 use crate::algo::shape::Point;
 
@@ -23,28 +24,14 @@ pub fn set_line_between_grid(
     ctx.line_to(to.y, to.x);
 }
 
-pub fn set_grid_boundary(
-    ctx: &CanvasRenderingContext2d,
-    from: Point<usize>,
-    to: Point<usize>,
-    space: f64,
-) {
-    if from.x == to.x {
-        set_line_between_grid(
-            ctx,
-            Point::new(from.x, to.y),
-            Point::new(to.x + 1, to.y),
-            space,
-        );
+pub fn extract_grid_boundary(
+    vertexes: &Vec<(Point<usize>, Point<usize>)>
+) -> Vec<(Point<usize>, Point<usize>)>{
+    let mut lines: Vec<(Point<usize>, Point<usize>)> = Vec::new();
+    for (from, to) in vertexes {
+        lines.push(grid_to_edge(from, to));
     }
-    if from.y == to.y {
-        set_line_between_grid(
-            ctx,
-            Point::new(to.x, from.y),
-            Point::new(to.x, to.y + 1),
-            space,
-        );
-    }
+    lines
 }
 
 pub fn draw_lines(
@@ -55,4 +42,44 @@ pub fn draw_lines(
     for (from, to) in edges {
         set_line_between_grid(ctx, from, to, space);
     }
+}
+
+pub fn expand_walls(edges: &Vec<(Point<usize>, Point<usize>)>) {
+    let (vertical_index, horizontal_index) = fetch_vertical_and_horizontal_edge_index(edges);
+    
+}
+
+fn grid_to_edge(from: &Point<usize>, to: &Point<usize>) -> (Point<usize>, Point<usize>){
+    if from.x == to.x {
+        return (Point::new(from.x, to.y), Point::new(to.x + 1, to.y))
+    }
+    if from.y == to.y {
+        return (
+            Point::new(to.x, from.y),
+            Point::new(to.x, to.y + 1));
+    }
+    return (*from, *to);
+}
+
+fn fetch_vertical_and_horizontal_edge_index(
+    edges: &Vec<(Point<usize>, Point<usize>)>
+) -> (Vec<usize>, Vec<usize>){
+    let mut vertical_index: HashSet<usize> = HashSet::new();
+    let mut horizontal_index: HashSet<usize> = HashSet::new();
+
+    for (from, to) in edges {
+        if from.x == to.x {
+            vertical_index.insert(from.x);
+        }
+        if from.y == to.y {
+            horizontal_index.insert(from.y);
+        }
+    }
+
+    let mut vertical_index_vec: Vec<usize> = vertical_index.into_iter().collect();
+    let mut horizontal_index_vec: Vec<usize> = horizontal_index.into_iter().collect();
+    vertical_index_vec.sort();
+    horizontal_index_vec.sort();
+
+    (vertical_index_vec, horizontal_index_vec)
 }
