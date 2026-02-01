@@ -1,0 +1,13 @@
+[package]
+name = "storage"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+usecase.workspace = true
+shared.workspace = true
+anyhow.workspace = true
+sqlx.workspace = true
+chrono.workspace = true
+serde.workspace = true
+async-trait.workspace = true
