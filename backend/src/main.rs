@@ -1,27 +1,18 @@
-mod handler;
-mod service;
-mod model;
-mod repository;
-
 use async_shutdown::ShutdownManager;
 use dotenv::dotenv;
 use axum::{Router, routing::get, http::StatusCode, Json, extract::State};
 use serde_json;
 use sqlx::postgres::{PgPoolOptions};
 use sqlx::PgPool;
-use tokio_postgres::{Client, Connection, Socket, Config};
-use tokio_postgres::config::SslMode;
-use openssl::ssl::{SslConnector, SslMethod};
-use postgres_openssl::MakeTlsConnector;
 use std::env;
 use tracing_subscriber;
 use tracing::info;
 
 use std::sync::Arc;
 
-use crate::handler::handler::*;
-use crate::service::service::*;
-use crate::repository::repository::*;
+use handler::handler::*;
+use usecase::service::service::*;
+use storage::repository::*;
 
 #[tokio::main]
 async fn main() {
