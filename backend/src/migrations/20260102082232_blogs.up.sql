@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS blogs (
 	
 	created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 	update_at TIMESTAMP,
-	delete_at TIMESTAMP,
 	
 	PRIMARY KEY (id)
 );
