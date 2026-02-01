@@ -1,6 +1,6 @@
-use usecase::repository::blog::*;
+use usecase::repository::blog::{BlogRepository};
+use usecase::model::blog::{Blog, BlogFilter};
 use super::repository::*;
-use super::model::blog::*;
 
 use async_trait::async_trait;
 
