@@ -11,7 +11,4 @@ ALTER COLUMN id_uuid SET DEFAULT gen_random_uuid();
 ALTER TABLE blogs
   DROP CONSTRAINT blogs_pkey,
   ADD PRIMARY KEY (id_uuid);
-
-ALTER TABLE users DROP COLUMN id;
-ALTER TABLE users RENAME COLUMN id_uuid TO id;
 COMMIT;
