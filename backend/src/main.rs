@@ -23,7 +23,7 @@ async fn main() {
 
     let pool = initialize_db().await;
 
-    let repository = Repository::new(pool.clone());
+    let repository = Box::new(Repository::new(pool.clone()));
 
     let service = Arc::new(Service::new(repository));
 
