@@ -4,7 +4,11 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - feature/*
+      - "feature/*"
+  pull_request:
+    paths-ignore:
+      - "backend/*"
+      - "README.md"
 
 jobs:
   lint:
