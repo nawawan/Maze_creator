@@ -551,6 +551,7 @@ name = "handler"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "serde",
  "serde_json",
  "usecase",
 ]
@@ -2017,9 +2018,11 @@ dependencies = [
 name = "usecase"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-trait",
  "chrono",
  "serde",
+ "tracing",
  "uuid",
 ]
 
