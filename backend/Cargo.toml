@@ -46,6 +46,7 @@ uuid = { version = "1.20.0", features = [
 ]}
 aws-config = "1.8.14"
 aws-sdk-s3 = "1.123.0"
+argon2 = "0.5.3"
 
 
 
@@ -71,4 +72,4 @@ async-trait.workspace = true
 uuid.workspace = true
 aws-config.workspace = true
 aws-sdk-s3.workspace = true
-
+argon2.workspace = true
