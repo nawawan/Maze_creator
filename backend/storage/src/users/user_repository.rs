@@ -11,7 +11,7 @@ impl UserRepository for Repository {
     async fn get_user_by_username(&self, username: &String) -> Result<User> {
         let user = sqlx::query_as!(
             User,
-            "SELECT name, password FROM users WHERE name = $1",
+            "SELECT name, password, salt FROM users WHERE name = $1",
             username)
             .fetch_one(&self.pool)
             .await?;
