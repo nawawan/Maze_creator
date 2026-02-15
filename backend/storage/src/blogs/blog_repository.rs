@@ -1,6 +1,6 @@
 use usecase::repository::blog::{BlogRepository};
 use usecase::model::blog::{Blog, BlogFilter};
-use super::repository::*;
+use super::super::repository::*;
 use anyhow::Result;
 
 use async_trait::async_trait;
@@ -19,7 +19,7 @@ impl BlogRepository for Repository {
     }
 
     async fn create_blog(&self, blog: Blog) -> Result<()> {
-        sqlx::query!("INSERT INTO blogs (id, title, status) VALUES ($1, $2, 'PUBLISHED')", blog.id as i32, blog.title).execute(&self.pool).await?;
+        sqlx::query!("INSERT INTO blogs (id, title, status) VALUES ($1, $2, 'PUBLISHED')", blog.id, blog.title).execute(&self.pool).await?;
         Ok(())
     }
 
