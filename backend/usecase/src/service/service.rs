@@ -1,7 +1,4 @@
-use super::super::repository::blog::BlogRepository;
-use super::super::repository::user::UserRepository;
-
-pub trait Reporisories: BlogRepository + UserRepository {}
+use crate::repository::repositories::Reporisories;
 pub struct Service {
     pub repository: Box<dyn Reporisories>,
 }

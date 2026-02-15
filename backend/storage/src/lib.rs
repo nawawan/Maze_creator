@@ -1,4 +1,4 @@
 pub mod repository;
-pub mod blog_repository;
-
+pub mod blogs;
+pub mod users;
 pub mod database;
