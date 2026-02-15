@@ -4,6 +4,7 @@ pub enum ErrorStatus {
     AlreadyExist,
     InternalError,
     Unauthorized,
+    Invalid,
 }
 
 pub struct AppError {
@@ -60,6 +61,19 @@ impl AppError {
             None => AppError {
                 status: ErrorStatus::AlreadyExist,
                 message: "Already exist".into(),
+            }
+        }
+    }
+
+    pub fn invalid(message: Option<&str>) -> Self {
+        match message {
+            Some(msg) => AppError {
+                status: ErrorStatus::Invalid,
+                message: msg.into(),
+            },
+            None => AppError {
+                status: ErrorStatus::Invalid,
+                message: "Invalid request".into(),
             }
         }
     }
