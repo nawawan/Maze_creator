@@ -6,4 +6,6 @@ use anyhow::Result;
 pub trait BlogRepository: Send + Sync {
     async fn get_blogs(&self, filter: BlogFilter) -> Vec<Blog>;
     async fn create_draft(&self) -> Result<String>;
+    async fn create_blog(&self, blog: Blog) -> Result<()>;
+    async fn upload_image(&self, blog_id: String, image_data: Vec<u8>) -> Result<String>;
 }

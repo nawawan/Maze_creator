@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Months, NaiveDate, Utc};
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "UPPERCASE")]
@@ -8,14 +9,20 @@ pub enum BlogStatus {
     Published,
 }
     
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Blog {
-    pub id: u32,
+    pub id: Uuid,
     pub title: String,
-    pub content_key: BlogStatus,
-    pub status: String,
+    pub content_key: String,
+    pub status: BlogStatus,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone)]
+pub struct BlogRequest {
+    pub title: String,
+    pub content: String,
 }
 
 pub struct BlogFilter {
