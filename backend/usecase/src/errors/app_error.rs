@@ -1,3 +1,4 @@
+use std::fmt;
 
 pub enum ErrorStatus {
     NotFound,
@@ -5,6 +6,18 @@ pub enum ErrorStatus {
     InternalError,
     Unauthorized,
     Invalid,
+}
+
+impl fmt::Display for ErrorStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ErrorStatus::NotFound => write!(f, "Not Found"),
+            ErrorStatus::AlreadyExist => write!(f, "Already Exist"),
+            ErrorStatus::InternalError => write!(f, "Internal Error"),
+            ErrorStatus::Unauthorized => write!(f, "Unauthorized"),
+            ErrorStatus::Invalid => write!(f, "Invalid"),
+        }
+    }
 }
 
 pub struct AppError {
@@ -76,5 +89,11 @@ impl AppError {
                 message: "Invalid request".into(),
             }
         }
+    }
+}
+
+impl fmt::Display for AppError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "status: {}, message: {}", self.status, self.message)
     }
 }
