@@ -44,6 +44,8 @@ async-trait = "0.1.89"
 uuid = { version = "1.20.0", features = [
     "v7"
 ]}
+aws-config = "1.8.14"
+aws-sdk-s3 = "1.123.0"
 
 
 
@@ -67,4 +69,6 @@ tracing-subscriber.workspace = true
 serde.workspace = true
 async-trait.workspace = true
 uuid.workspace = true
+aws-config.workspace = true
+aws-sdk-s3.workspace = true
 
