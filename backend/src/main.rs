@@ -4,6 +4,9 @@ use axum::{Router, routing::get, http::StatusCode, Json, extract::State};
 use serde_json;
 use sqlx::postgres::{PgPoolOptions};
 use sqlx::PgPool;
+use aws_sdk_s3::Client;
+use aws_config::{BehaviorVersion, Region};
+use aws_sdk_s3::config::Credentials;
 use std::env;
 use tracing_subscriber;
 use tracing::info;
@@ -22,19 +25,18 @@ async fn main() {
     dotenv().ok();
 
     let pool = initialize_db().await;
+    let r2_client = initialize_cloud_storage().await;
 
-    let repository = Box::new(Repository::new(pool.clone()));
-
+    let repository = Box::new(Repository::new(pool.clone(), r2_client));
     let service = Arc::new(Service::new(repository));
+
 
     let app = Router::new()
             .route("/", get(|| async { "Hello, World!" }))
             .nest("/health", create_health_router(pool))
             .nest("/api", create_blog_router(service.clone()))
             .fallback(fallback);
-
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.expect("error: failed to bind to address");
-
     let shutdown = ShutdownManager::new();
 
     match axum::serve(listener, app).await {
@@ -67,30 +69,28 @@ fn create_health_router(pool: PgPool) -> Router {
 }
 
 async fn initialize_db() -> PgPool {
-
-    // let mut config = Config::new();
-
-    // let db_host = env::var("DB_HOST").expect("DB_HOST must be set");
-    // let db_port = env::var("DB_PORT").expect("DB_PORT must be set");
-    // let db_user = env::var("DB_USER").expect("DB_USER must be set");
-    // let db_password = env::var("DB_PASSWORD").expect("DB_PASSWORD must be set");
-    // let db_name = env::var("DB_NAME").expect("DB_NAME must be set");
-
-    // config.host(&db_host);
-    // config.port(db_port.parse::<u16>().expect("DB_PORT must be a valid u16"));
-    // config.user(&db_user);
-    // config.password(&db_password);
-    // config.dbname(&db_name);
-    // config.ssl_mode(SslMode::Require);
-
-    // let connector = SslConnector::builder(SslMethod::tls()).expect("Failed to create TLS connector");
-    // let tls = MakeTlsConnector::new(connector.build());
-
     let db_url = env::var("DB_URL").expect("DB_URL must be set");
-
     let pool = PgPoolOptions::new().max_connections(5).connect(&db_url).await.expect("Failed to connect to database");
-
     pool
+}
+
+async fn initialize_cloud_storage() -> Client {
+    let account_id = env::var("CLOUDFLARE_ACCOUNT_ID").expect("CLOUDFLARE_ACCOUNT_ID must be set");
+    let access_key_id = env::var("CLOUDFLARE_ACCESS_KEY_ID").expect("CLOUDFLARE_ACCESS_KEY_ID must be set");
+    let secret_access_key = env::var("CLOUDFLARE_SECRET_ACCESS_KEY").expect("CLOUDFLARE_SECRET_ACCESS_KEY must be set");
+    let config = aws_config::defaults(BehaviorVersion::latest())
+        .endpoint_url(format!("https://{}.r2.cloudflarestorage.com", account_id))
+        .region(Region::new("auto"))
+        .credentials_provider(Credentials::new(
+            access_key_id,
+            secret_access_key,
+            None,
+            None,
+            "R2",
+        ))
+        .load()
+        .await;
+    Client::new(&config)
 }
 
 async fn fallback() -> (StatusCode, &'static str) {
