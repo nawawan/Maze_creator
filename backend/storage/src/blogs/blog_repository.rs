@@ -1,6 +1,7 @@
 use usecase::repository::blog::{BlogRepository};
 use usecase::model::blog::{Blog, BlogFilter};
 use usecase::errors::repo_error::RepoError;
+use usecase::repository::types::Transaction;
 use super::super::repository::*;
 use aws_sdk_s3::primitives::ByteStream;
 use tracing::error;
@@ -15,7 +16,7 @@ impl BlogRepository for Repository {
         return vec![];
     }
 
-    async fn create_draft(&self) -> Result<String, RepoError> {
+    async fn create_draft(&self, tx: &mut Transaction<'_>) -> Result<String, RepoError> {
         let res= sqlx::query!("INSERT INTO blogs (id, status) VALUES (DEFAULT, 'DRAFT') RETURNING id").fetch_one(&self.pool).await.map_err(|e| {
             error!("Failed to create draft blog: {}", e);
             RepoError::Internal("Failed to create draft blog".to_string())
@@ -23,8 +24,8 @@ impl BlogRepository for Repository {
         return Ok(res.id.simple().to_string());
     }
 
-    async fn create_blog(&self, blog: Blog) -> Result<(), RepoError> {
-        sqlx::query!("INSERT INTO blogs (id, title, status) VALUES ($1, $2, 'PUBLISHED')", blog.id, blog.title).execute(&self.pool).await.map_err(|e| {
+    async fn create_blog(&self, tx: &mut Transaction<'_>, blog: Blog) -> Result<(), RepoError> {
+        sqlx::query!("INSERT INTO blogs (id, title, status) VALUES ($1, $2, 'PUBLISHED')", blog.id, blog.title).execute(&mut **tx).await.map_err(|e| {
             if let Some(db_err) = e.as_database_error() {
                 if db_err.code() == Some("23505".into()) {
                     error!("Blog with the same id: {} already exists, err: {}", blog.id, e);
@@ -74,7 +75,9 @@ mod tests {
     async fn test_create_draft_can_fetch_id(pool: sqlx::PgPool) -> Result<()> {
         let repo = Repository::new(pool, Client::new(&aws_config::load_defaults(BehaviorVersion::latest()).await));
 
-        let draft_id = repo.create_draft().await;
+        let mut tx = repo.pool.begin().await?;
+        let draft_id = repo.create_draft(&mut tx).await;
+        tx.commit().await?;
 
         if let Ok(id) = draft_id {
             assert!(!id.is_empty());

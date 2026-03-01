@@ -30,7 +30,12 @@ impl BlogService for Service {
     }
 
     async fn create_draft(&self) -> Result<String, AppError> {
-        let id = self.repository.create_draft().await?;
+        let mut tx = self.repository.create_transaction().await?;
+        let id = self.repository.create_draft(&mut tx).await?;
+        tx.commit().await.map_err(|e| {
+            error!("Failed to commit transaction for creating draft: {e}");
+            AppError::internal(Some("Transaction commit failed"))
+        })?;
         Ok(id)
     }
 
@@ -53,17 +58,19 @@ impl BlogService for Service {
             updated_at: chrono::Utc::now(),
         };
 
-        let tx = self.repository.create_transaction().await?;
+        let result = {
+            let mut tx = self.repository.create_transaction().await?;
+            self.repository.create_blog(&mut tx, blog).await?;
+            self.repository.upload_blog_draft(uuid.to_string(), blog_req.content).await?;
 
-        let _ = self.repository.create_blog(blog).await;
+            tx.commit().await.map_err(|e| {
+                error!("Failed to commit transaction for creating blog: {e}");
+                AppError::internal(Some("Transaction commit failed"))
+            })?;
 
-        self.repository.upload_blog_draft(uuid.to_string(), blog_req.content).await?;
+            Ok::<_, AppError>(())
+        };
 
-        tx.commit().await.map_err(|e| {
-            error!("Failed to commit transaction for creating blog: {e}");
-            AppError::internal(Some("Transaction commit failed"))
-        })?;
-
-        Ok(())
+        result
     }
 }
