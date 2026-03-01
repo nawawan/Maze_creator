@@ -5,6 +5,8 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tracing::error;
 
+use crate::model::blog::BlogResponse;
+
 use super::error::UsecaseError;
 use super::handler::{Handler};
 use super::model::blog::CreateBlogRequest;
@@ -29,7 +31,7 @@ impl Handler {
         }))
     }
 
-    pub async fn create_blog(Json(req): Json<CreateBlogRequest>, state: State<Arc<Service>>) -> Result<Json<()>, UsecaseError> {
+    pub async fn create_blog(Json(req): Json<CreateBlogRequest>, state: State<Arc<Service>>) -> Result<Json<BlogResponse>, UsecaseError> {
         let blog_req = BlogRequest {
             title: req.title,
             content: req.content,
@@ -41,7 +43,7 @@ impl Handler {
         if let Err(ref e) = result {
             error!("Failed to create blog: {}", e.message);
         }
-        result?;
-        Ok(Json(()))
+        let blog = result?;
+        Ok(Json(blog.into()))
     }
 }

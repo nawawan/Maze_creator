@@ -1,3 +1,5 @@
+use std::fmt;
+
 use serde::{Deserialize, Serialize};
 use chrono::{Months, NaiveDateTime};
 use uuid::Uuid;
@@ -7,6 +9,15 @@ use uuid::Uuid;
 pub enum BlogStatus {
     Draft,
     Published,
+}
+
+impl fmt::Display for BlogStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            BlogStatus::Draft => write!(f, "DRAFT"),
+            BlogStatus::Published => write!(f, "PUBLISHED"),
+        }
+    }
 }
     
 #[derive(Debug, Clone)]
