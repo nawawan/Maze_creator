@@ -1,15 +1,19 @@
-use crate::{error::UsecaseError, model::user::UserResponse};
 use crate::model::user::LoginRequest;
+use crate::{error::UsecaseError, model::user::UserResponse};
 
 use super::handler::Handler;
-use tracing::{error};
-use axum::{extract::{Json, State}};
+use axum::extract::{Json, State};
 use std::sync::Arc;
+use tracing::error;
 use usecase::service::service::Service;
 use usecase::service::user::user_service::UserService;
 
 impl Handler {
-    pub async fn login_admin(&self, Json(req): Json<LoginRequest>, state: State<Arc<Service>>) -> Result<Json<UserResponse>, UsecaseError>{
+    pub async fn login_admin(
+        &self,
+        Json(req): Json<LoginRequest>,
+        state: State<Arc<Service>>,
+    ) -> Result<Json<UserResponse>, UsecaseError> {
         let service = state.0.clone();
 
         let (username, password) = (req.username, req.password);

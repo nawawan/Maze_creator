@@ -1,5 +1,5 @@
-use std::fmt;
 use super::repo_error::RepoError;
+use std::fmt;
 
 pub enum ErrorStatus {
     NotFound,
@@ -36,7 +36,7 @@ impl AppError {
             None => AppError {
                 status: ErrorStatus::InternalError,
                 message: "Internal error".into(),
-            }
+            },
         }
     }
 
@@ -49,7 +49,7 @@ impl AppError {
             None => AppError {
                 status: ErrorStatus::NotFound,
                 message: "Not found".into(),
-            }
+            },
         }
     }
 
@@ -62,7 +62,7 @@ impl AppError {
             None => AppError {
                 status: ErrorStatus::Unauthorized,
                 message: "Unauthorized".into(),
-            }
+            },
         }
     }
 
@@ -75,7 +75,7 @@ impl AppError {
             None => AppError {
                 status: ErrorStatus::AlreadyExist,
                 message: "Already exist".into(),
-            }
+            },
         }
     }
 
@@ -88,7 +88,7 @@ impl AppError {
             None => AppError {
                 status: ErrorStatus::Invalid,
                 message: "Invalid request".into(),
-            }
+            },
         }
     }
 }
@@ -99,19 +99,12 @@ impl fmt::Display for AppError {
     }
 }
 
-
 impl From<RepoError> for AppError {
     fn from(error: RepoError) -> Self {
         match error {
-            RepoError::Conflict(e) => {
-                AppError::already_exist(Some(&e.to_string()))
-            },
-            RepoError::Internal(e) => {
-                AppError::internal(Some(&e.to_string()))
-            },
-            RepoError::NotFound(e) => {
-                AppError::not_found(Some(&e.to_string()))
-            },
+            RepoError::Conflict(e) => AppError::already_exist(Some(&e.to_string())),
+            RepoError::Internal(e) => AppError::internal(Some(&e.to_string())),
+            RepoError::NotFound(e) => AppError::not_found(Some(&e.to_string())),
         }
     }
 }

@@ -1,9 +1,9 @@
-use usecase::repository::user::{UserRepository};
-use usecase::model::user::{User};
 use super::super::repository::*;
-use usecase::errors::repo_error::RepoError;
-use sqlx;
 use async_trait::async_trait;
+use sqlx;
+use usecase::errors::repo_error::RepoError;
+use usecase::model::user::User;
+use usecase::repository::user::UserRepository;
 
 #[async_trait]
 impl UserRepository for Repository {
@@ -11,14 +11,18 @@ impl UserRepository for Repository {
         let user = sqlx::query_as!(
             User,
             "SELECT id, name, password, salt FROM users WHERE name = $1",
-            username)
-            .fetch_one(&self.pool)
-            .await
-            .map_err(|e| {
-                match e {
-                    sqlx::Error::RowNotFound => RepoError::NotFound(format!("User with username: {} not found", username)),
-                    _ => RepoError::Internal(format!("Failed to get user by username: {}, error: {}", username, e))
-                }
+            username
+        )
+        .fetch_one(&self.pool)
+        .await
+        .map_err(|e| match e {
+            sqlx::Error::RowNotFound => {
+                RepoError::NotFound(format!("User with username: {} not found", username))
+            }
+            _ => RepoError::Internal(format!(
+                "Failed to get user by username: {}, error: {}",
+                username, e
+            )),
         })?;
 
         Ok(user)

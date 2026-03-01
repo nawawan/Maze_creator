@@ -1,6 +1,6 @@
 use async_trait::async_trait;
-use tracing::{error, warn};
 use std::env;
+use tracing::{error, warn};
 
 use crate::model::user::User;
 
@@ -21,7 +21,9 @@ impl UserService for Service {
             Ok(user) => user,
             Err(e) => {
                 warn!("Failed to get user: {}, error: {}", username, e);
-                return Err(AppError::invalid(Some("The pair of username and password is incorrect")));
+                return Err(AppError::invalid(Some(
+                    "The pair of username and password is incorrect",
+                )));
             }
         };
 
@@ -31,13 +33,17 @@ impl UserService for Service {
             Ok(hash) => hash,
             Err(e) => {
                 error!("Failed to hash password: {}, error: {}", username, e);
-                return Err(AppError::internal(Some("Internal error on hashing password")));
+                return Err(AppError::internal(Some(
+                    "Internal error on hashing password",
+                )));
             }
         };
 
         if hash != user.password {
             warn!("Incorrect password for user: {}", username);
-            return Err(AppError::invalid(Some("The pair of username and password is incorrect")));
+            return Err(AppError::invalid(Some(
+                "The pair of username and password is incorrect",
+            )));
         }
 
         Ok(user)

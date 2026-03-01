@@ -1,6 +1,4 @@
-pub struct Handler {
-
-}
+pub struct Handler {}
 
 impl Handler {
     pub fn new() -> Self {

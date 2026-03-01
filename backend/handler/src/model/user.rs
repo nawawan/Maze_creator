@@ -6,7 +6,6 @@ pub struct LoginRequest {
     pub password: String,
 }
 
-
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct UserResponse {
     pub id: String,
@@ -20,4 +19,4 @@ impl From<User> for UserResponse {
             username: user.name,
         }
     }
-}   
+}

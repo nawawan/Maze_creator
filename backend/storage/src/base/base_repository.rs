@@ -1,9 +1,9 @@
-use usecase::repository::base_repository::BaseRepository;
-use usecase::errors::repo_error::RepoError;
-use usecase::repository::types::Transaction;
 use super::super::repository::*;
 use async_trait::async_trait;
 use tracing::error;
+use usecase::errors::repo_error::RepoError;
+use usecase::repository::base_repository::BaseRepository;
+use usecase::repository::types::Transaction;
 
 #[async_trait]
 impl BaseRepository for Repository {

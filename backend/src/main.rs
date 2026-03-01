@@ -1,25 +1,24 @@
 use async_shutdown::ShutdownManager;
-use dotenv::dotenv;
-use axum::{Router, routing::get, http::StatusCode, Json, extract::State};
-use serde_json;
-use sqlx::postgres::{PgPoolOptions};
-use sqlx::PgPool;
-use aws_sdk_s3::Client;
 use aws_config::{BehaviorVersion, Region};
+use aws_sdk_s3::Client;
 use aws_sdk_s3::config::Credentials;
+use axum::{Json, Router, extract::State, http::StatusCode, routing::get};
+use dotenv::dotenv;
+use serde_json;
+use sqlx::PgPool;
+use sqlx::postgres::PgPoolOptions;
 use std::env;
-use tracing_subscriber;
 use tracing::info;
+use tracing_subscriber;
 
 use std::sync::Arc;
 
 use handler::handler::*;
-use usecase::service::service::*;
 use storage::repository::*;
+use usecase::service::service::*;
 
 #[tokio::main]
 async fn main() {
-
     tracing_subscriber::fmt().json().init();
 
     dotenv().ok();
@@ -30,19 +29,20 @@ async fn main() {
     let repository = Box::new(Repository::new(pool.clone(), r2_client));
     let service = Arc::new(Service::new(repository));
 
-
     let app = Router::new()
-            .route("/", get(|| async { "Hello, World!" }))
-            .nest("/health", create_health_router(pool))
-            .nest("/api", create_blog_router(service.clone()))
-            .fallback(fallback);
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.expect("error: failed to bind to address");
+        .route("/", get(|| async { "Hello, World!" }))
+        .nest("/health", create_health_router(pool))
+        .nest("/api", create_blog_router(service.clone()))
+        .fallback(fallback);
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:8000")
+        .await
+        .expect("error: failed to bind to address");
     let shutdown = ShutdownManager::new();
 
     match axum::serve(listener, app).await {
         Ok(()) => {
             shutdown.trigger_shutdown(0).ok();
-        },
+        }
         Err(e) => {
             info!("server error: {}", e);
             shutdown.trigger_shutdown(1).ok();
@@ -55,7 +55,10 @@ async fn main() {
 
 fn create_blog_router(service: Arc<Service>) -> Router {
     Router::new()
-        .route("/blogs", get(Handler::get_blogs).post(|| async { "Blog posts" }))
+        .route(
+            "/blogs",
+            get(Handler::get_blogs).post(|| async { "Blog posts" }),
+        )
         .route("/blogs/{id}", get(|| async { "Blog get by ID" }))
         .fallback(api_fallback)
         .with_state(service)
@@ -70,14 +73,20 @@ fn create_health_router(pool: PgPool) -> Router {
 
 async fn initialize_db() -> PgPool {
     let db_url = env::var("DB_URL").expect("DB_URL must be set");
-    let pool = PgPoolOptions::new().max_connections(5).connect(&db_url).await.expect("Failed to connect to database");
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&db_url)
+        .await
+        .expect("Failed to connect to database");
     pool
 }
 
 async fn initialize_cloud_storage() -> Client {
     let account_id = env::var("CLOUDFLARE_ACCOUNT_ID").expect("CLOUDFLARE_ACCOUNT_ID must be set");
-    let access_key_id = env::var("CLOUDFLARE_ACCESS_KEY_ID").expect("CLOUDFLARE_ACCESS_KEY_ID must be set");
-    let secret_access_key = env::var("CLOUDFLARE_SECRET_ACCESS_KEY").expect("CLOUDFLARE_SECRET_ACCESS_KEY must be set");
+    let access_key_id =
+        env::var("CLOUDFLARE_ACCESS_KEY_ID").expect("CLOUDFLARE_ACCESS_KEY_ID must be set");
+    let secret_access_key =
+        env::var("CLOUDFLARE_SECRET_ACCESS_KEY").expect("CLOUDFLARE_SECRET_ACCESS_KEY must be set");
     let config = aws_config::defaults(BehaviorVersion::latest())
         .endpoint_url(format!("https://{}.r2.cloudflarestorage.com", account_id))
         .region(Region::new("auto"))
@@ -102,7 +111,6 @@ async fn health_ok() -> StatusCode {
 }
 
 async fn db_health_ok(State(pool): State<PgPool>) -> StatusCode {
-
     let connection_result = sqlx::query("SELECT 1").fetch_one(&pool).await;
     match connection_result {
         Ok(_) => StatusCode::OK,
@@ -111,7 +119,10 @@ async fn db_health_ok(State(pool): State<PgPool>) -> StatusCode {
 }
 
 async fn api_fallback() -> (StatusCode, Json<serde_json::Value>) {
-    (StatusCode::NOT_FOUND, Json(serde_json::json!({
-        "status": "Not Found"
-    })))
+    (
+        StatusCode::NOT_FOUND,
+        Json(serde_json::json!({
+            "status": "Not Found"
+        })),
+    )
 }

@@ -1,7 +1,7 @@
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
 use chrono::{Months, NaiveDateTime};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -19,7 +19,7 @@ impl fmt::Display for BlogStatus {
         }
     }
 }
-    
+
 #[derive(Debug, Clone)]
 pub struct Blog {
     pub id: Uuid,
@@ -46,17 +46,26 @@ impl BlogFilter {
     }
 }
 
-fn converter_string_to_datetime(year: Option<&String>, month: Option<&String>) -> (Option<NaiveDateTime>, Option<NaiveDateTime>) {
+fn converter_string_to_datetime(
+    year: Option<&String>,
+    month: Option<&String>,
+) -> (Option<NaiveDateTime>, Option<NaiveDateTime>) {
     if year.is_none() {
-       return (None, None);
+        return (None, None);
     }
 
     let y = year.unwrap().parse::<i32>().unwrap();
-    let start = NaiveDateTime::new(chrono::NaiveDate::from_ymd_opt(y, 1, 1).unwrap(), chrono::NaiveTime::from_hms_opt(0, 0, 0).unwrap());
+    let start = NaiveDateTime::new(
+        chrono::NaiveDate::from_ymd_opt(y, 1, 1).unwrap(),
+        chrono::NaiveTime::from_hms_opt(0, 0, 0).unwrap(),
+    );
 
     if let Some(m) = month {
         let month_num = m.parse::<u32>().unwrap();
-        return (start.checked_add_months(Months::new(month_num - 1)), start.checked_add_months(Months::new(month_num)));
+        return (
+            start.checked_add_months(Months::new(month_num - 1)),
+            start.checked_add_months(Months::new(month_num)),
+        );
     }
 
     (Some(start), start.checked_add_months(Months::new(12)))

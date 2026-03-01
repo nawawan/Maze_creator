@@ -1,6 +1,6 @@
+use aws_sdk_s3::Client;
 use sqlx::PgPool;
 use usecase::repository::repositories::Repositories;
-use aws_sdk_s3::Client;
 
 pub struct Repository {
     pub pool: PgPool,

@@ -1,7 +1,7 @@
-use super::super::model::blog::*;
-use async_trait::async_trait;
 use super::super::errors::repo_error::RepoError;
+use super::super::model::blog::*;
 use super::types::Transaction;
+use async_trait::async_trait;
 
 #[async_trait]
 pub trait BlogRepository: Send + Sync {

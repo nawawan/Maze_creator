@@ -1,5 +1,6 @@
 use axum::{
-    Json, extract::{Query, State}
+    Json,
+    extract::{Query, State},
 };
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -8,14 +9,17 @@ use tracing::error;
 use crate::model::blog::BlogResponse;
 
 use super::error::UsecaseError;
-use super::handler::{Handler};
+use super::handler::Handler;
 use super::model::blog::CreateBlogRequest;
 use usecase::model::blog::BlogRequest;
-use usecase::service::blog::blog_service::{BlogService};
-use usecase::service::service::Service; 
+use usecase::service::blog::blog_service::BlogService;
+use usecase::service::service::Service;
 
 impl Handler {
-    pub async fn get_blogs(Query(params): Query<HashMap<String, String>>, state: State<Arc<Service>>) -> Json<serde_json::Value> {
+    pub async fn get_blogs(
+        Query(params): Query<HashMap<String, String>>,
+        state: State<Arc<Service>>,
+    ) -> Json<serde_json::Value> {
         let year = params.get("year");
         let month = params.get("month");
 
@@ -31,7 +35,10 @@ impl Handler {
         }))
     }
 
-    pub async fn create_blog(Json(req): Json<CreateBlogRequest>, state: State<Arc<Service>>) -> Result<Json<BlogResponse>, UsecaseError> {
+    pub async fn create_blog(
+        Json(req): Json<CreateBlogRequest>,
+        state: State<Arc<Service>>,
+    ) -> Result<Json<BlogResponse>, UsecaseError> {
         let blog_req = BlogRequest {
             title: req.title,
             content: req.content,
