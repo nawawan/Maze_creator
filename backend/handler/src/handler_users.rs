@@ -1,7 +1,3 @@
-
-use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
-
 use crate::error::UsecaseError;
 use crate::model::user::LoginRequest;
 
