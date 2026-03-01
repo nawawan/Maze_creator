@@ -1,5 +1,5 @@
 use sqlx::PgPool;
-use usecase::repository::repositories::Reporisories;
+use usecase::repository::repositories::Repositories;
 use aws_sdk_s3::Client;
 
 pub struct Repository {
@@ -13,5 +13,4 @@ impl Repository {
     }
 }
 
-impl Reporisories for Repository {
-}
+impl Repositories for Repository {}
