@@ -23,11 +23,12 @@ jobs:
         uses: Swatinem/rust-cache@v2
       - name: install cargo
         uses: dtolnay/rust-toolchain@stable
-      - run: cd backend
       - name: Run clippy
         run: cargo clippy
+        working-directory: backend
       - name: Run rustfmt
         run: cargo fmt -- --check
+        working-directory: backend
   test:
     runs-on: ubuntu-latest
     steps:
