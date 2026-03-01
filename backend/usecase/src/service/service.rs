@@ -1,10 +1,10 @@
-use crate::repository::repositories::Reporisories;
+use crate::repository::repositories::Repositories;
 pub struct Service {
-    pub repository: Box<dyn Reporisories>,
+    pub repository: Box<dyn Repositories>,
 }
 
 impl Service {
-    pub fn new(repository: Box<dyn Reporisories>) -> Self {
+    pub fn new(repository: Box<dyn Repositories>) -> Self {
         Self { repository }
     }
 }
