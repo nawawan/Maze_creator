@@ -12,3 +12,4 @@ anyhow.workspace = true
 tracing.workspace  = true
 argon2.workspace = true
 sqlx.workspace = true
+thiserror.workspace = true

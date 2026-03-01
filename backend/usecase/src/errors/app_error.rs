@@ -1,4 +1,5 @@
 use std::fmt;
+use super::repo_error::RepoError;
 
 pub enum ErrorStatus {
     NotFound,
@@ -95,5 +96,22 @@ impl AppError {
 impl fmt::Display for AppError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "status: {}, message: {}", self.status, self.message)
+    }
+}
+
+
+impl From<RepoError> for AppError {
+    fn from(error: RepoError) -> Self {
+        match error {
+            RepoError::Conflict(e) => {
+                AppError::already_exist(Some(&e.to_string()))
+            },
+            RepoError::Internal(e) => {
+                AppError::internal(Some(&e.to_string()))
+            },
+            RepoError::NotFound(e) => {
+                AppError::not_found(Some(&e.to_string()))
+            },
+        }
     }
 }
