@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - feature/*
+    paths-ignore:
+      - frontend/*
+      - nginx/*
   pull_request:
     paths-ignore:
       - "backend/*"

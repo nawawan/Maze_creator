@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - "feature/*"
+    paths-ignore:
+      - backend/*
+      - "README.md"
   pull_request:
     paths-ignore:
       - "backend/*"
