@@ -1,11 +1,11 @@
 use axum::{
-    extract::{Query, State},
-    Json,
-    response::Response,
+    Json, extract::{Query, State}, http::StatusCode, response::{IntoResponse, Response}
 };
 use std::collections::HashMap;
 use std::sync::Arc;
+use tracing::error;
 
+use super::error::UsecaseError;
 use super::handler::{Handler};
 use super::model::blog::CreateBlogRequest;
 use usecase::model::blog::BlogRequest;
@@ -29,7 +29,7 @@ impl Handler {
         }))
     }
 
-    pub async fn create_blog(Json(req): Json<CreateBlogRequest>, state: State<Arc<Service>>) -> Json<serde_json::Value> {
+    pub async fn create_blog(Json(req): Json<CreateBlogRequest>, state: State<Arc<Service>>) -> Result<Json<()>, UsecaseError> {
         let blog_req = BlogRequest {
             title: req.title,
             content: req.content,
@@ -37,13 +37,11 @@ impl Handler {
 
         let service = state.0.clone();
 
-        service.create_blog(blog_req);
-
-        Json(serde_json::json!({
-            "status": "success",
-            "data": {
-                "id": "123"
-            }
-        }))
+        let result = service.create_blog(blog_req).await;
+        if let Err(ref e) = result {
+            error!("Failed to create blog: {}", e.message);
+        }
+        result?;
+        Ok(Json(()))
     }
 }

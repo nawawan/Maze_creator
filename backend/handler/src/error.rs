@@ -25,3 +25,9 @@ impl IntoResponse for UsecaseError {
         (status, Json(ErrorBody{code, message})).into_response()
     }
 }
+
+impl From<AppError> for UsecaseError {
+    fn from(error: AppError) -> Self {
+        UsecaseError { error }
+    }
+}

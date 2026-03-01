@@ -1,6 +1,3 @@
-use usecase::repository::blog::BlogRepository;
-use usecase::service::service::Service;
-
 pub struct Handler {
 
 }
