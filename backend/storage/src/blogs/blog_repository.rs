@@ -17,15 +17,15 @@ impl BlogRepository for Repository {
     }
 
     async fn create_draft(&self, tx: &mut Transaction<'_>) -> Result<String, RepoError> {
-        let res= sqlx::query!("INSERT INTO blogs (id, status) VALUES (DEFAULT, 'DRAFT') RETURNING id").fetch_one(&self.pool).await.map_err(|e| {
+        let res= sqlx::query!("INSERT INTO blogs (id, status) VALUES (DEFAULT, 'DRAFT') RETURNING id").fetch_one(&mut **tx).await.map_err(|e| {
             error!("Failed to create draft blog: {}", e);
             RepoError::Internal("Failed to create draft blog".to_string())
         })?;
         return Ok(res.id.simple().to_string());
     }
 
-    async fn create_blog(&self, tx: &mut Transaction<'_>, blog: Blog) -> Result<(), RepoError> {
-        sqlx::query!("INSERT INTO blogs (id, title, status) VALUES ($1, $2, 'PUBLISHED')", blog.id, blog.title).execute(&mut **tx).await.map_err(|e| {
+    async fn create_blog(&self, tx: &mut Transaction<'_>, blog: Blog) -> Result<Blog, RepoError> {
+        sqlx::query!("INSERT INTO blogs (id, title, status, content_key) VALUES ($1, $2, 'PUBLISHED', $3)", blog.id, blog.title, blog.content_key).execute(&mut **tx).await.map_err(|e| {
             if let Some(db_err) = e.as_database_error() {
                 if db_err.code() == Some("23505".into()) {
                     error!("Blog with the same id: {} already exists, err: {}", blog.id, e);
@@ -35,7 +35,7 @@ impl BlogRepository for Repository {
             error!("Failed to create blog: {}", e);
             RepoError::Internal("Failed to create blog".to_string())
         })?;
-        Ok(())
+        Ok(blog)
     }
 
     async fn upload_image(&self, image_id: String, image_data: Vec<u8>) -> Result<(), RepoError> {

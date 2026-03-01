@@ -5,7 +5,6 @@ use super::super::service::{Service};
 
 use super::super::super::model::blog::{Blog, BlogFilter, BlogRequest, BlogStatus};
 use async_trait::async_trait;
-use anyhow::{anyhow, Result};
 use tracing::error;
 use uuid::{Uuid};
 use std::env;
@@ -13,7 +12,7 @@ use std::env;
 #[async_trait]
 pub trait BlogService {
     fn get_blogs(&self, year: Option<&String>, month: Option<&String>);
-    async fn create_blog(&self, blog: BlogRequest) -> Result<(), AppError>;
+    async fn create_blog(&self, blog: BlogRequest) -> Result<Blog, AppError>;
     async fn create_draft(&self) -> Result<String, AppError>;
 }
 
@@ -23,9 +22,7 @@ impl BlogService for Service {
         if year.is_none() && !month.is_none() {
             return;
         }
-        
         let filter = BlogFilter::new(year, month);
-
         let blogs = self.repository.get_blogs(filter);
     }
 
@@ -39,7 +36,7 @@ impl BlogService for Service {
         Ok(id)
     }
 
-    async fn create_blog(&self, blog_req: BlogRequest) -> Result<(), AppError> {
+    async fn create_blog(&self, blog_req: BlogRequest) -> Result<Blog, AppError> {
         let uuid = Uuid::now_v7();
         let blog_url = env::var("BLOG_PAGE");
 
@@ -53,14 +50,12 @@ impl BlogService for Service {
             id: uuid, 
             title: blog_req.title,
             content_key: content_key,
-            status: BlogStatus::Published,
-            created_at: chrono::Utc::now(),
-            updated_at: chrono::Utc::now(),
+            status: BlogStatus::Published
         };
 
         let result = {
             let mut tx = self.repository.create_transaction().await?;
-            self.repository.create_blog(&mut tx, blog).await?;
+            let blog = self.repository.create_blog(&mut tx, blog).await?;
             self.repository.upload_blog_draft(uuid.to_string(), blog_req.content).await?;
 
             tx.commit().await.map_err(|e| {
@@ -68,7 +63,7 @@ impl BlogService for Service {
                 AppError::internal(Some("Transaction commit failed"))
             })?;
 
-            Ok::<_, AppError>(())
+            Ok::<Blog, AppError>(blog)
         };
 
         result

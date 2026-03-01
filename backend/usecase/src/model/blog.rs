@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Months, NaiveDate, Utc};
+use chrono::{Months, NaiveDateTime};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -15,8 +15,6 @@ pub struct Blog {
     pub title: String,
     pub content_key: String,
     pub status: BlogStatus,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone)]
@@ -26,8 +24,8 @@ pub struct BlogRequest {
 }
 
 pub struct BlogFilter {
-    pub start: Option<DateTime<Utc>>,
-    pub end: Option<DateTime<Utc>>,
+    pub start: Option<NaiveDateTime>,
+    pub end: Option<NaiveDateTime>,
 }
 
 impl BlogFilter {
@@ -37,17 +35,13 @@ impl BlogFilter {
     }
 }
 
-fn converter_string_to_datetime(year: Option<&String>, month: Option<&String>) -> (Option<DateTime<Utc>>, Option<DateTime<Utc>>) {
+fn converter_string_to_datetime(year: Option<&String>, month: Option<&String>) -> (Option<NaiveDateTime>, Option<NaiveDateTime>) {
     if year.is_none() {
        return (None, None);
     }
 
     let y = year.unwrap().parse::<i32>().unwrap();
-    let start = DateTime::from_naive_utc_and_offset(
-        NaiveDate::from_ymd_opt(y, 1, 1)
-            .unwrap()
-            .and_hms_opt(0, 0, 0)
-            .unwrap(), Utc);
+    let start = NaiveDateTime::new(chrono::NaiveDate::from_ymd_opt(y, 1, 1).unwrap(), chrono::NaiveTime::from_hms_opt(0, 0, 0).unwrap());
 
     if let Some(m) = month {
         let month_num = m.parse::<u32>().unwrap();
