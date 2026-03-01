@@ -2,18 +2,20 @@ use async_trait::async_trait;
 use tracing::{error, warn};
 use std::env;
 
+use crate::model::user::User;
+
 use super::super::super::errors::app_error::AppError;
 use super::super::service::Service;
 use super::helper;
 
 #[async_trait]
 pub trait UserService {
-    async fn login(&self, username: &String, password: &String) -> Result<(), AppError>;
+    async fn login(&self, username: &String, password: &String) -> Result<User, AppError>;
 }
 
 #[async_trait]
 impl UserService for Service {
-    async fn login(&self, username: &String, password: &String) -> Result<(), AppError> {
+    async fn login(&self, username: &String, password: &String) -> Result<User, AppError> {
         let res = self.repository.get_user_by_username(username).await;
         let user = match res {
             Ok(user) => user,
@@ -38,6 +40,6 @@ impl UserService for Service {
             return Err(AppError::invalid(Some("The pair of username and password is incorrect")));
         }
 
-        Ok(())
+        Ok(user)
     }
 }
