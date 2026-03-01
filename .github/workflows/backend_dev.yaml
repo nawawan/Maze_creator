@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - feature/*
+      - feature/**
     paths-ignore:
-      - frontend/*
-      - nginx/*
+      - frontend/**
+      - nginx/**
   pull_request:
     paths-ignore:
-      - "backend/*"
+      - "backend/**"
       - "README.md"
 
 jobs:
