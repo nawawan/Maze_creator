@@ -8,10 +8,14 @@ on:
     paths-ignore:
       - backend/**
       - "README.md"
+      - ".github/**"
+      - ".gitignore"
   pull_request:
     paths-ignore:
       - "backend/**"
       - "README.md"
+      - ".github/**"
+      - ".gitignore"
 
 jobs:
   lint:
