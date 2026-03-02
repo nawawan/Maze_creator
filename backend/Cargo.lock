@@ -2786,6 +2786,7 @@ dependencies = [
  "sqlx",
  "tracing",
  "usecase",
+ "uuid",
 ]
 
 [[package]]
