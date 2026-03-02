@@ -95,8 +95,9 @@ mod tests {
     use anyhow::Result;
     use aws_config::BehaviorVersion;
     use aws_sdk_s3::Client;
+    use uuid::Uuid;
 
-    #[sqlx::test]
+    #[sqlx::test(migrations = "../src/migrations")]
     async fn test_create_draft_can_fetch_id(pool: sqlx::PgPool) -> Result<()> {
         let repo = Repository::new(
             pool,
@@ -105,12 +106,31 @@ mod tests {
 
         let mut tx = repo.pool.begin().await?;
         let draft_id = repo.create_draft(&mut tx).await;
-        tx.commit().await?;
 
         if let Ok(id) = draft_id {
             assert!(!id.is_empty());
         }
 
+        Ok(())
+    }
+
+    #[sqlx::test(migrations = "../src/migrations")]
+    async fn test_create_blog_already_exists(pool: sqlx::PgPool) -> Result<()> {
+        let repo = Repository::new(
+            pool,
+            Client::new(&aws_config::load_defaults(BehaviorVersion::latest()).await),
+        );let blog = Blog {
+            id: Uuid::now_v7(),
+            title: "Test Blog".to_string(),
+            content_key: "test-blog".to_string(),
+            status: usecase::model::blog::BlogStatus::Published,
+        };
+
+        let mut tx = repo.pool.begin().await?;
+        let _ = repo.create_blog(&mut tx, blog.clone()).await;
+        let result = repo.create_blog(&mut tx, blog).await;
+        assert!(result.is_err());
+        assert!(matches!(result.unwrap_err(), RepoError::Conflict(_)));
         Ok(())
     }
 }
