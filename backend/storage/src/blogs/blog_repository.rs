@@ -53,7 +53,6 @@ impl BlogRepository for Repository {
     }
 
     async fn upload_image(&self, image_id: String, image_data: Vec<u8>) -> Result<(), RepoError> {
-        // Implement the logic to upload the image and return the URL
         let body = ByteStream::from(image_data);
         let bucket_name = "blog-assets/_uploads";
 
@@ -72,7 +71,6 @@ impl BlogRepository for Repository {
     }
 
     async fn upload_blog_draft(&self, blog_id: String, content: String) -> Result<(), RepoError> {
-        // Implement the logic to upload the blog draft content
         let body = ByteStream::from(content.into_bytes());
         let bucket_name = "blog-assets/uploads";
         self.r2_client
