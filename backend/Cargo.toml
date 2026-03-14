@@ -48,6 +48,7 @@ aws-config = "1.8.14"
 aws-sdk-s3 = "1.123.0"
 argon2 = "0.5.3"
 thiserror = "2.0.18"
+mockall = "0.14.0"
 
 
 
@@ -75,3 +76,4 @@ aws-config.workspace = true
 aws-sdk-s3.workspace = true
 argon2.workspace = true
 thiserror.workspace = true
+mockall.workspace = true
