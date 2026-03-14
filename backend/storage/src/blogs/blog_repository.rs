@@ -119,7 +119,8 @@ mod tests {
         let repo = Repository::new(
             pool,
             Client::new(&aws_config::load_defaults(BehaviorVersion::latest()).await),
-        );let blog = Blog {
+        );
+        let blog = Blog {
             id: Uuid::now_v7(),
             title: "Test Blog".to_string(),
             content_key: "test-blog".to_string(),

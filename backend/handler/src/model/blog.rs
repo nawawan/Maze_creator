@@ -1,4 +1,4 @@
-use usecase::model::blog::{Blog};
+use usecase::model::blog::Blog;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct CreateBlogRequest {
