@@ -1,5 +1,6 @@
 use super::super::repository::*;
 use aws_sdk_s3::primitives::ByteStream;
+use aws_sdk_s3::error::ProvideErrorMetadata;
 use tracing::error;
 use usecase::errors::repo_error::RepoError;
 use usecase::model::blog::{Blog, BlogFilter};
@@ -56,33 +57,34 @@ impl BlogRepository for Repository {
 
     async fn upload_image(&self, image_id: String, image_data: Bytes) -> Result<Image, RepoError> {
         let body = ByteStream::from(image_data);
-        let bucket_name = "blog-assets/_uploads";
+        let bucket_name = "blog-assets";
 
         self.r2_client
             .put_object()
             .bucket(bucket_name)
-            .key(format!("{}", image_id))
+            .key(format!("_uploads/{}", image_id))
             .body(body)
             .send()
             .await
             .map_err(|e| {
-                error!("Failed to upload image id: {} err: {}", image_id, e);
+                error!(image_id = %image_id, error = %e);
+                error!(code=e.code(), message=e.message().unwrap_or("No error message"));
                 RepoError::Internal("Failed to upload image".to_string())
             })?;
             
         Ok(Image {
             id: image_id.clone(),
-            url: format!("images/{}", image_id),
+            url: format!("{}/images/{}", self.config.host, image_id),
         })
     }
 
     async fn upload_blog_draft(&self, blog_id: String, content: String) -> Result<(), RepoError> {
         let body = ByteStream::from(content.into_bytes());
-        let bucket_name = "blog-assets/uploads";
+        let bucket_name = "blog-assets";
         self.r2_client
             .put_object()
             .bucket(bucket_name)
-            .key(format!("drafts/{}", blog_id))
+            .key(format!("uploads/drafts/{}", blog_id))
             .body(body)
             .send()
             .await
@@ -101,6 +103,7 @@ mod tests {
     use anyhow::Result;
     use aws_config::BehaviorVersion;
     use aws_sdk_s3::Client;
+    use shared::config::Config;
     use uuid::Uuid;
 
     #[sqlx::test(migrations = "../src/migrations")]
@@ -108,6 +111,7 @@ mod tests {
         let repo = Repository::new(
             pool,
             Client::new(&aws_config::load_defaults(BehaviorVersion::latest()).await),
+            Config { host: "test".into() }
         );
 
         let mut tx = repo.pool.begin().await?;
@@ -125,6 +129,7 @@ mod tests {
         let repo = Repository::new(
             pool,
             Client::new(&aws_config::load_defaults(BehaviorVersion::latest()).await),
+            Config { host: "test".into() }
         );
         let blog = Blog {
             id: Uuid::now_v7(),

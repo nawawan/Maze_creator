@@ -76,7 +76,7 @@ impl BlogService for Service {
     async fn upload_blog_image(&self, image_data: Bytes) -> Result<Image, AppError> {
         let image_id = Uuid::now_v7().to_string().replace("-", "");
         self.repository
-            .upload_image(image_id.clone(), image_data)
+            .upload_image(image_id, image_data)
             .await
             .map_err(|e| {
                 error!("Failed to upload blog image: {e}");

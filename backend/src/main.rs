@@ -16,6 +16,7 @@ use std::sync::Arc;
 use handler::handler::*;
 use storage::repository::*;
 use usecase::service::service::*;
+use shared::config::Config;
 
 #[tokio::main]
 async fn main() {
@@ -25,8 +26,9 @@ async fn main() {
 
     let pool = initialize_db().await;
     let r2_client = initialize_cloud_storage().await;
+    let config = Config { host: env::var("PAGE_HOST").expect("PAGE_HOST must be set") };
 
-    let repository = Box::new(Repository::new(pool.clone(), r2_client));
+    let repository = Box::new(Repository::new(pool.clone(), r2_client, config));
     let service = Arc::new(Service::new(repository));
 
     let app = Router::new()
