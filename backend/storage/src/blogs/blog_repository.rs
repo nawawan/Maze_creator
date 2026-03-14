@@ -3,6 +3,7 @@ use aws_sdk_s3::primitives::ByteStream;
 use tracing::error;
 use usecase::errors::repo_error::RepoError;
 use usecase::model::blog::{Blog, BlogFilter};
+use usecase::model::image::Image;
 use usecase::repository::blog::BlogRepository;
 use usecase::repository::types::Transaction;
 
@@ -52,7 +53,7 @@ impl BlogRepository for Repository {
         Ok(blog)
     }
 
-    async fn upload_image(&self, image_id: String, image_data: Vec<u8>) -> Result<(), RepoError> {
+    async fn upload_image(&self, image_id: String, image_data: Vec<u8>) -> Result<Image, RepoError> {
         let body = ByteStream::from(image_data);
         let bucket_name = "blog-assets/_uploads";
 
@@ -67,7 +68,11 @@ impl BlogRepository for Repository {
                 error!("Failed to upload image id: {} err: {}", image_id, e);
                 RepoError::Internal("Failed to upload image".to_string())
             })?;
-        Ok(())
+            
+        Ok(Image {
+            id: image_id.clone(),
+            url: format!("images/{}", image_id),
+        })
     }
 
     async fn upload_blog_draft(&self, blog_id: String, content: String) -> Result<(), RepoError> {

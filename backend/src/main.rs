@@ -2,7 +2,7 @@ use async_shutdown::ShutdownManager;
 use aws_config::{BehaviorVersion, Region};
 use aws_sdk_s3::Client;
 use aws_sdk_s3::config::Credentials;
-use axum::{Json, Router, extract::State, http::StatusCode, routing::get};
+use axum::{Json, Router, extract::State, http::StatusCode, routing::get, routing::post};
 use dotenv::dotenv;
 use serde_json;
 use sqlx::PgPool;
@@ -54,14 +54,18 @@ async fn main() {
 }
 
 fn create_blog_router(service: Arc<Service>) -> Router {
-    Router::new()
+    let blog_routers = Router::new()
         .route(
-            "/blogs",
+            "/",
             get(Handler::get_blogs).post(|| async { "Blog posts" }),
         )
-        .route("/blogs/{id}", get(|| async { "Blog get by ID" }))
+        .route("/{id}", get(|| async { "Blog get by ID" }))
+        .route("/", post(Handler::create_blog))
+        .route("/images", post(Handler::))
         .fallback(api_fallback)
-        .with_state(service)
+        .with_state(service);
+
+    Router::new().nest("/blogs", blog_routers)
 }
 
 fn create_health_router(pool: PgPool) -> Router {

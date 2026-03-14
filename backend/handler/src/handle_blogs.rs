@@ -7,6 +7,7 @@ use std::sync::Arc;
 use tracing::error;
 
 use crate::model::blog::BlogResponse;
+use crate::model::image::ImageResponse;
 
 use super::error::UsecaseError;
 use super::handler::Handler;
@@ -36,8 +37,8 @@ impl Handler {
     }
 
     pub async fn create_blog(
-        Json(req): Json<CreateBlogRequest>,
         state: State<Arc<Service>>,
+        Json(req): Json<CreateBlogRequest>,
     ) -> Result<Json<BlogResponse>, UsecaseError> {
         let blog_req = BlogRequest {
             title: req.title,
@@ -52,5 +53,22 @@ impl Handler {
         }
         let blog = result?;
         Ok(Json(blog.into()))
+    }
+
+    pub async fn upload_blog_image(
+        state: State<Arc<Service>>,
+        Json(req): Json<HashMap<String, String>>,
+    ) -> Result<Json<ImageResponse>, UsecaseError> {
+
+        let image = req.get("image");
+        if image.is_none() {
+            return Err(UsecaseError::bad_request("image is required"));
+        }
+
+        let service = state.0.clone();
+        service.upload_blog_image(image.unwrap().to_string())
+            .await
+            .map(|image| Json(image.into()))
+            .map_err(UsecaseError::from)
     }
 }
