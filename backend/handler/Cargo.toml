@@ -1,0 +1,11 @@
+[package]
+name = "handler"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axum.workspace = true
+usecase.workspace = true
+serde_json.workspace = true
+serde.workspace = true
+tracing.workspace = true

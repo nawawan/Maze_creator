@@ -1,4 +1,8 @@
 frontend/wasm/target
 frontend/src/stories
 
+backend/target
+backend/.env
+
 review
+design

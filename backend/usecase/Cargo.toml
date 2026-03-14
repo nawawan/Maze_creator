@@ -1,0 +1,15 @@
+[package]
+name = "usecase"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde.workspace = true
+chrono.workspace = true
+async-trait.workspace = true
+uuid.workspace = true
+anyhow.workspace = true
+tracing.workspace  = true
+argon2.workspace = true
+sqlx.workspace = true
+thiserror.workspace = true

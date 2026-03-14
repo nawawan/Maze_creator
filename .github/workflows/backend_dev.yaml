@@ -1,0 +1,46 @@
+name: Backend CICD
+run-name: deploy backend app to cloud run
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/**
+    paths-ignore:
+      - frontend/**
+      - nginx/**
+      - ".github/**"
+      - ".gitignore"
+  pull_request:
+    paths-ignore:
+      - "backend/**"
+      - "README.md"
+      - ".github/**"
+      - ".gitignore"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+      - name: install cargo
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run clippy
+        run: cargo clippy
+        working-directory: backend
+      - name: Run rustfmt
+        run: cargo fmt -- --check
+        working-directory: backend
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+      - name: install cargo
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run tests
+        run: cd backend && cargo test

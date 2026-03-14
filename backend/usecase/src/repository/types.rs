@@ -1,0 +1,1 @@
+pub type Transaction<'a> = sqlx::Transaction<'a, sqlx::Postgres>;
