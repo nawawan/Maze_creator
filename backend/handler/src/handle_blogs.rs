@@ -1,6 +1,6 @@
 use axum::{
     Json,
-    extract::{Query, State},
+    extract::{Query, State, Multipart},
 };
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -57,18 +57,20 @@ impl Handler {
 
     pub async fn upload_blog_image(
         state: State<Arc<Service>>,
-        Json(req): Json<HashMap<String, String>>,
+        mut multipart: Multipart,
     ) -> Result<Json<ImageResponse>, UsecaseError> {
-
-        let image = req.get("image");
-        if image.is_none() {
-            return Err(UsecaseError::bad_request("image is required"));
+        while let Some(field) = multipart.next_field().await.unwrap() {
+            let name = field.name().unwrap_or("unknown").to_string();
+            let data = field.bytes().await.unwrap();
+            if name != "image" {
+                continue;
+            }
+            let service = state.0.clone();
+            return service.upload_blog_image(data)
+                .await
+                .map(|image| Json(image.into()))
+                .map_err(UsecaseError::from);
         }
-
-        let service = state.0.clone();
-        service.upload_blog_image(image.unwrap().to_string())
-            .await
-            .map(|image| Json(image.into()))
-            .map_err(UsecaseError::from)
+        Err(UsecaseError::bad_request("No image field in multipart"))
     }
 }

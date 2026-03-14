@@ -6,6 +6,7 @@ use super::super::service::Service;
 use async_trait::async_trait;
 use std::env;
 use tracing::error;
+use bytes::Bytes;
 use uuid::Uuid;
 
 #[async_trait]
@@ -13,7 +14,7 @@ pub trait BlogService {
     fn get_blogs(&self, year: Option<&String>, month: Option<&String>);
     async fn create_blog(&self, blog: BlogRequest) -> Result<Blog, AppError>;
     async fn create_draft(&self) -> Result<String, AppError>;
-    async fn upload_blog_image(&self, image_data: String) -> Result<Image, AppError>;
+    async fn upload_blog_image(&self, image_data: Bytes) -> Result<Image, AppError>;
 }
 
 #[async_trait]
@@ -70,10 +71,12 @@ impl BlogService for Service {
 
         result
     }
-    async fn upload_blog_image(&self, image_data: String) -> Result<Image, AppError> {
+
+
+    async fn upload_blog_image(&self, image_data: Bytes) -> Result<Image, AppError> {
         let image_id = Uuid::now_v7().to_string().replace("-", "");
         self.repository
-            .upload_image(image_id.clone(), image_data.into_bytes())
+            .upload_image(image_id.clone(), image_data)
             .await
             .map_err(|e| {
                 error!("Failed to upload blog image: {e}");

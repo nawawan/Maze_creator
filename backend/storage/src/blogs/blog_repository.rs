@@ -8,6 +8,7 @@ use usecase::repository::blog::BlogRepository;
 use usecase::repository::types::Transaction;
 
 use async_trait::async_trait;
+use bytes::Bytes;
 
 #[async_trait]
 impl BlogRepository for Repository {
@@ -53,7 +54,7 @@ impl BlogRepository for Repository {
         Ok(blog)
     }
 
-    async fn upload_image(&self, image_id: String, image_data: Vec<u8>) -> Result<Image, RepoError> {
+    async fn upload_image(&self, image_id: String, image_data: Bytes) -> Result<Image, RepoError> {
         let body = ByteStream::from(image_data);
         let bucket_name = "blog-assets/_uploads";
 

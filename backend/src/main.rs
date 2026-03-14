@@ -57,11 +57,10 @@ fn create_blog_router(service: Arc<Service>) -> Router {
     let blog_routers = Router::new()
         .route(
             "/",
-            get(Handler::get_blogs).post(|| async { "Blog posts" }),
+            get(Handler::get_blogs).post(Handler::create_blog),
         )
         .route("/{id}", get(|| async { "Blog get by ID" }))
-        .route("/", post(Handler::create_blog))
-        .route("/images", post(Handler::))
+        .route("/images", post(Handler::upload_blog_image))
         .fallback(api_fallback)
         .with_state(service);
 
@@ -76,7 +75,7 @@ fn create_health_router(pool: PgPool) -> Router {
 }
 
 async fn initialize_db() -> PgPool {
-    let db_url = env::var("DB_URL").expect("DB_URL must be set");
+    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(&db_url)
