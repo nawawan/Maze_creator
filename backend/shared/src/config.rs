@@ -8,6 +8,10 @@ pub struct StorageConfig {
     pub blog_image_bucket: String,
 }
 
+pub struct Config {
+    pub host: String
+}
+
 impl DatabaseConfig {
     pub fn new(url: String, max_connection: u32) -> Self {
         Self {

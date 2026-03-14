@@ -12,6 +12,14 @@ struct ErrorBody {
     message: String,
 }
 
+impl UsecaseError {
+    pub fn bad_request(message: &str) -> Self {
+        UsecaseError {
+            error: AppError::internal(Some(message)),
+        }
+    }
+}
+
 impl IntoResponse for UsecaseError {
     fn into_response(self) -> axum::response::Response {
         let (status, code, message) = match self.error.status {

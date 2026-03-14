@@ -14,7 +14,7 @@ shared = { path = "./shared" }
 registry = { path = "./registry" }
 anyhow = "1.0.100"
 async-shutdown = "0.2.2"
-axum = "0.8.8"
+axum = { version="0.8.8", features = ["multipart"]}
 chrono = { version = "0.4.42", features = ["serde"] }
 dotenv = "0.15.0"
 log = "0.4.29"
@@ -49,6 +49,7 @@ aws-sdk-s3 = "1.123.0"
 argon2 = "0.5.3"
 thiserror = "2.0.18"
 mockall = "0.14.0"
+bytes = "1.11.1"
 
 
 
@@ -77,3 +78,4 @@ aws-sdk-s3.workspace = true
 argon2.workspace = true
 thiserror.workspace = true
 mockall.workspace = true
+bytes.workspace = true

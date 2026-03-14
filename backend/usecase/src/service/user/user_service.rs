@@ -29,7 +29,7 @@ impl UserService for Service {
 
         let pepper = env::var("PASSWORD_PEPPER").expect("A value of pepper is not set");
 
-        let hash = match helper::hash_with_salt_pepper(password, &user.salt.to_string(), &pepper) {
+        let hash = match helper::hash_with_salt_pepper(password, &user.salt, &pepper) {
             Ok(hash) => hash,
             Err(e) => {
                 error!("Failed to hash password: {}, error: {}", username, e);

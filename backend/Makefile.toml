@@ -1,0 +1,41 @@
+[tasks.create-hash]
+workspace = false
+script_runner = "@rust"
+script = '''
+//! ```cargo
+//! [dependencies]
+//!  argon2 = "0.5.3"
+//!  ```
+use argon2::password_hash::SaltString;
+use argon2::{Argon2, PasswordHasher};
+fn main() {
+    let password = &std::env::args().collect::<Vec<String>>()[1];
+    let pepper = &std::env::args().collect::<Vec<String>>()[2];
+    let salt = &std::env::args().collect::<Vec<String>>()[3];
+    println!("{}, {}, {}", password, pepper, salt);
+    let preppered = format!("{password}{pepper}");
+    let salt = SaltString::encode_b64(salt.as_bytes()).unwrap();
+    let hash = Argon2::default()
+        .hash_password(preppered.as_bytes(), &salt).unwrap().to_string();
+    println!("{}", hash);
+}
+'''
+
+
+[tasks.create-uuid]
+workspace = false
+script_runner = "@rust"
+script = '''
+//! ```cargo
+//! [dependencies]
+//!  uuid = { version = "1.20.0", features = [
+//!  "v7"
+//!  ]}
+//!  ```
+use uuid::Uuid;
+fn main() {
+    let uuid = Uuid::now_v7();
+    println!("{}", uuid);
+}
+'''
+
