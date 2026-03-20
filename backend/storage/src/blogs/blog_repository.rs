@@ -99,11 +99,15 @@ impl BlogRepository for Repository {
 #[cfg(test)]
 mod tests {
 
+    use crate::redis::RedisClient;
+    use shared::config::RedisConfig;
+
     use super::*;
     use anyhow::Result;
     use aws_config::BehaviorVersion;
     use aws_sdk_s3::Client;
     use shared::config::Config;
+    use anyhow::anyhow;
     use uuid::Uuid;
 
     #[sqlx::test(migrations = "../src/migrations")]
@@ -111,6 +115,7 @@ mod tests {
         let repo = Repository::new(
             pool,
             Client::new(&aws_config::load_defaults(BehaviorVersion::latest()).await),
+            RedisClient::new(RedisConfig{host: "test".to_string(), port: 60}).map_err(|e| anyhow!("uni")).expect("test"),
             Config { host: "test".into() }
         );
 
@@ -129,6 +134,7 @@ mod tests {
         let repo = Repository::new(
             pool,
             Client::new(&aws_config::load_defaults(BehaviorVersion::latest()).await),
+            RedisClient::new(RedisConfig{host: "test".to_string(), port: 60}).map_err(|e| anyhow!("uni")).expect("test"),
             Config { host: "test".into() }
         );
         let blog = Blog {

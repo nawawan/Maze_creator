@@ -46,6 +46,8 @@ impl UserService for Service {
             )));
         }
 
+        let token = self.repository.create_token(user.id).await;
+
         Ok(user)
     }
 }

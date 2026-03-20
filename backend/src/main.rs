@@ -7,6 +7,7 @@ use dotenv::dotenv;
 use serde_json;
 use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
+use storage::redis::RedisClient;
 use std::env;
 use tracing::info;
 use tracing_subscriber;
@@ -16,7 +17,7 @@ use std::sync::Arc;
 use handler::handler::*;
 use storage::repository::*;
 use usecase::service::service::*;
-use shared::config::Config;
+use shared::config::{Config, RedisConfig};
 
 #[tokio::main]
 async fn main() {
@@ -26,9 +27,10 @@ async fn main() {
 
     let pool = initialize_db().await;
     let r2_client = initialize_cloud_storage().await;
+    let redis_client = initialize_redis();
     let config = Config { host: env::var("PAGE_HOST").expect("PAGE_HOST must be set") };
 
-    let repository = Box::new(Repository::new(pool.clone(), r2_client, config));
+    let repository = Box::new(Repository::new(pool.clone(), r2_client, redis_client, config));
     let service = Arc::new(Service::new(repository));
 
     let app = Router::new()
@@ -105,6 +107,15 @@ async fn initialize_cloud_storage() -> Client {
         .load()
         .await;
     Client::new(&config)
+}
+
+fn initialize_redis() -> RedisClient {
+    let config = RedisConfig {
+        host: env::var("REDIS_HOST").expect("REDIS_HOST must be set"),
+        port: env::var("REDIS_PORT").expect("REDIS_PORT must be set").into(),
+    };
+
+    RedisClient::new(config).expect("creating redis client failed")
 }
 
 async fn fallback() -> (StatusCode, &'static str) {

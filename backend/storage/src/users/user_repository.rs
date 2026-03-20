@@ -2,8 +2,9 @@ use super::super::repository::*;
 use async_trait::async_trait;
 use sqlx;
 use usecase::errors::repo_error::RepoError;
-use usecase::model::user::User;
+use usecase::model::user::{Token, User};
 use usecase::repository::user::UserRepository;
+use uuid::Uuid;
 
 #[async_trait]
 impl UserRepository for Repository {
@@ -26,5 +27,11 @@ impl UserRepository for Repository {
         })?;
 
         Ok(user)
+    }
+
+    async fn create_token(&self, user_id: Uuid) -> Token {
+        let token = Token::new(user_id);
+        self.
+        token
     }
 }
