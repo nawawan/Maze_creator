@@ -19,15 +19,21 @@ impl RedisClient {
         Ok(Self { client })
     }
 
-    pub async fn insert(&self, key: String, val: String) -> Result<(), AppError>{
-        let mut con = self.client.get_multiplexed_async_connection().await?;
-        let _: () = con.set(key, val).await?;
+    pub async fn set_ex<T: RedisKey>(&self, key: T, val: &T::Value, ttl: u64) -> Result<(), AppError>{
+        let mut conn = self.client.get_multiplexed_async_connection().await?;
+        let _: () = conn.set_ex(key.inner(), val.inner(), ttl).await?;
         Ok(())
     }
 
-    pub async fn get(&self, key: String) -> Result<String, AppError> {
-        let mut con = self.client.get_multiplexed_async_connection().await?;
-        let res: String = con.get(key).await?;
-        Ok(res)
+    pub async fn get<T: RedisKey>(&self, key: T) -> Result<Option<T::Value>, AppError> {
+        let mut conn = self.client.get_multiplexed_async_connection().await?;
+        let res: Option<String> = conn.get(key.inner()).await?;
+        res.map(T::Value::try_from).transpose()
+    }
+
+    pub async fn delete<T: RedisKey>(&self, key: T) -> Result<(), AppError> {
+        let mut conn = self.client.get_multiplexed_async_connection().await?;
+        let _: () = conn.del(key.inner()).await?;
+        Ok(())
     }
 }
