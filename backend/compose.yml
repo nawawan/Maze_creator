@@ -13,7 +13,7 @@ services:
       POSTGRES_PASSWORD: 'postgres'
       
   redis:
-    image: redis:7
+    image: redis:8.6
     container_name: redis_pta
     ports:
       - 6379:6379

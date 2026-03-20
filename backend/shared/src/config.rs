@@ -12,6 +12,11 @@ pub struct Config {
     pub host: String
 }
 
+pub struct RedisConfig {
+    pub host: String,
+    pub port: u16,
+}
+
 impl DatabaseConfig {
     pub fn new(url: String, max_connection: u32) -> Self {
         Self {
