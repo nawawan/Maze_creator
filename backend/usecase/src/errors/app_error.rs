@@ -1,5 +1,3 @@
-use redis::RedisError;
-
 use super::repo_error::RepoError;
 use std::fmt;
 
@@ -108,11 +106,5 @@ impl From<RepoError> for AppError {
             RepoError::Internal(e) => AppError::internal(Some(&e.to_string())),
             RepoError::NotFound(e) => AppError::not_found(Some(&e.to_string())),
         }
-    }
-}
-
-impl From<RedisError> for AppError {
-    fn from(error: RedisError) -> Self {
-        AppError::internal(error.detail())
     }
 }

@@ -1,7 +1,7 @@
-use usecase::errors::app_error::AppError;
+use usecase::errors::repo_error::RepoError;
 
 pub trait RedisKey {
-    type Value : RedisValue + TryFrom<String, Error=AppError>;
+    type Value : RedisValue + TryFrom<String, Error=RepoError>;
     fn inner(&self) -> String;
 }
 

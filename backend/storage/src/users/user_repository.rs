@@ -1,3 +1,5 @@
+use crate::users::model::{AccessToken, AuthorizedUserId};
+
 use super::super::repository::*;
 use async_trait::async_trait;
 use sqlx;
@@ -30,8 +32,15 @@ impl UserRepository for Repository {
     }
 
     async fn create_token(&self, user_id: Uuid) -> Token {
-        let token = Token::new(user_id);
-        self.
+        let token = Token::new(user_id.clone());
+        let key: AccessToken = token.access_token.clone().into();
+        let val: AuthorizedUserId = user_id.into();
+        self.redis_client.set_ex(&key, &val, 300);
         token
+    }
+
+    async fn delete_token(&self, token: Token) {
+        let key: AccessToken = token.into();
+        self.redis_client.delete(key);
     }
 }

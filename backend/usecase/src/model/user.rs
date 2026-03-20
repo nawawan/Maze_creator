@@ -1,5 +1,3 @@
-use std::fmt::DebugTuple;
-
 use uuid::Uuid;
 #[derive(Clone)]
 pub struct User {
@@ -9,7 +7,7 @@ pub struct User {
     pub salt: String,
 }
 
-
+#[derive(Clone)]
 pub struct Token {
     pub id: Uuid,
     pub access_token: String
