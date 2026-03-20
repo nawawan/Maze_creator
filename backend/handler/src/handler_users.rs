@@ -1,5 +1,5 @@
-use crate::model::user::LoginRequest;
-use crate::{error::UsecaseError, model::user::UserResponse};
+use crate::model::user::{LoginRequest, LoginResponse};
+use crate::{error::UsecaseError};
 
 use super::handler::Handler;
 use axum::extract::{Json, State};
@@ -10,10 +10,9 @@ use usecase::service::user::user_service::UserService;
 
 impl Handler {
     pub async fn login_admin(
-        &self,
-        Json(req): Json<LoginRequest>,
         state: State<Arc<Service>>,
-    ) -> Result<Json<UserResponse>, UsecaseError> {
+        Json(req): Json<LoginRequest>,
+    ) -> Result<Json<LoginResponse>, UsecaseError> {
         let service = state.0.clone();
 
         let (username, password) = (req.username, req.password);
@@ -22,7 +21,7 @@ impl Handler {
         if let Err(ref e) = result {
             error!("Failed to login: {}", e.message);
         }
-        let user = result?;
-        Ok(Json(user.into()))
+        let token = result?;
+        Ok(Json(token.into()))
     }
 }

@@ -1,9 +1,15 @@
-use usecase::model::user::User;
+use usecase::model::user::{Token, User};
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct LoginRequest {
     pub username: String,
     pub password: String,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct LoginResponse {
+    pub user_id: String,
+    pub access_token: String,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -17,6 +23,15 @@ impl From<User> for UserResponse {
         Self {
             id: user.id.to_string(),
             username: user.name,
+        }
+    }
+}
+
+impl From<Token> for LoginResponse {
+    fn from(token: Token) -> Self {
+        Self {
+            user_id: token.id.to_string(),
+            access_token: token.access_token,
         }
     }
 }
