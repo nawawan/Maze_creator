@@ -35,7 +35,7 @@ impl RedisValue for AuthorizedUserId {
 
 impl From<Uuid> for AuthorizedUserId {
     fn from(value: Uuid) -> Self {
-        Self(value.simple().to_string())
+        Self(value.to_string())
     }
 }
 

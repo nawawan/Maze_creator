@@ -1,4 +1,7 @@
+use std::str::FromStr;
+
 use crate::users::model::{AccessToken, AuthorizedUserId};
+use crate::redis::model::RedisValue;
 
 use super::super::repository::*;
 use async_trait::async_trait;
@@ -31,16 +34,28 @@ impl UserRepository for Repository {
         Ok(user)
     }
 
-    async fn create_token(&self, user_id: Uuid) -> Token {
+    async fn create_token(&self, user_id: Uuid) -> Result<Token, RepoError> {
         let token = Token::new(user_id.clone());
         let key: AccessToken = token.access_token.clone().into();
         let val: AuthorizedUserId = user_id.into();
-        self.redis_client.set_ex(&key, &val, 300);
-        token
+        self.redis_client.set_ex(&key, &val, 300).await?;
+        Ok(token)
     }
 
-    async fn delete_token(&self, token: Token) {
+    async fn delete_token(&self, token: Token) -> Result<(), RepoError>{
         let key: AccessToken = token.into();
-        self.redis_client.delete(key);
+        self.redis_client.delete(key).await?;
+        Ok(())
+    }
+
+    async fn fetch_user_id_by_token(&self, token: Token) -> Option<Uuid> {
+        let key: AccessToken = token.into();
+        match self.redis_client.get(key).await {
+            Ok(user_id) => {
+                user_id.and_then(|uid| Uuid::from_str(&uid.inner()).ok())
+            },
+            Err(_) => None
+        }
+
     }
 }
