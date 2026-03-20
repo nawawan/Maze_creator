@@ -112,7 +112,7 @@ async fn initialize_cloud_storage() -> Client {
 fn initialize_redis() -> RedisClient {
     let config = RedisConfig {
         host: env::var("REDIS_HOST").expect("REDIS_HOST must be set"),
-        port: env::var("REDIS_PORT").expect("REDIS_PORT must be set").into(),
+        port: env::var("REDIS_PORT").expect("REDIS_PORT must be set"),
     };
 
     RedisClient::new(config).expect("creating redis client failed")

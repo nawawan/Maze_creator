@@ -115,7 +115,7 @@ mod tests {
         let repo = Repository::new(
             pool,
             Client::new(&aws_config::load_defaults(BehaviorVersion::latest()).await),
-            RedisClient::new(RedisConfig{host: "test".to_string(), port: 60}).map_err(|e| anyhow!("uni")).expect("test"),
+            RedisClient::new(RedisConfig{host: "test".to_string(), port: "6937".to_string()}).map_err(|e| anyhow!("uni")).expect("test"),
             Config { host: "test".into() }
         );
 
@@ -134,7 +134,7 @@ mod tests {
         let repo = Repository::new(
             pool,
             Client::new(&aws_config::load_defaults(BehaviorVersion::latest()).await),
-            RedisClient::new(RedisConfig{host: "test".to_string(), port: 60}).map_err(|e| anyhow!("uni")).expect("test"),
+            RedisClient::new(RedisConfig{host: "test".to_string(), port: "6937".to_string()}).map_err(|e| anyhow!("uni")).expect("test"),
             Config { host: "test".into() }
         );
         let blog = Blog {

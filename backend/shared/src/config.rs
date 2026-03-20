@@ -14,7 +14,7 @@ pub struct Config {
 
 pub struct RedisConfig {
     pub host: String,
-    pub port: u16,
+    pub port: String,
 }
 
 impl DatabaseConfig {
