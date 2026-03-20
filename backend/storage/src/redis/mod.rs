@@ -28,9 +28,9 @@ impl RedisClient {
         res.map(T::Value::try_from).transpose()
     }
 
-    pub async fn delete<T: RedisKey>(&self, key: T) -> Result<(), RepoError> {
+    pub async fn delete<T: RedisKey>(&self, key: T) -> Result<u64, RepoError> {
         let mut conn = self.client.get_multiplexed_async_connection().await?;
-        let _: () = conn.del(key.inner()).await?;
-        Ok(())
+        let count: u64 = conn.del(key.inner()).await?;
+        Ok(count)
     }
 }

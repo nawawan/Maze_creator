@@ -37,7 +37,7 @@ async fn main() {
         .route("/", get(|| async { "Hello, World!" }))
         .nest("/health", create_health_router(pool))
         .nest("/api", create_blog_router(service.clone()))
-        .nest("/", create_users_router(service))
+        .nest("/users", create_users_router(service))
         .fallback(fallback);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8000")
         .await
@@ -74,7 +74,7 @@ fn create_blog_router(service: Arc<Service>) -> Router {
 
 fn create_users_router(service: Arc<Service>) -> Router {
     Router::new()
-        .route("/admin", post(Handler::login_admin))
+        .route("/admin/login", post(Handler::login_admin))
         .fallback(api_fallback)
         .with_state(service)
 }
