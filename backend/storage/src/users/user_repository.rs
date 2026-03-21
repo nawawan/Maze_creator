@@ -10,7 +10,7 @@ impl UserRepository for Repository {
     async fn get_user_by_username(&self, username: &String) -> Result<User, RepoError> {
         let user = sqlx::query_as!(
             User,
-            "SELECT id, name, password, salt FROM users WHERE name = $1",
+            "SELECT replace(id::text, '-', '') as id, name, password, salt FROM users WHERE name = $1",
             username
         )
         .fetch_one(&self.pool)
