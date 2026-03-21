@@ -77,7 +77,7 @@ impl BlogRepository for Repository {
 
         Ok(Image {
             id: image_id.clone(),
-            url: format!("{}/images/{}", self.config.host, image_id),
+            url: format!("{}/_uploads/{}", self.config.host, image_id),
         })
     }
 
