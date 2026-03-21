@@ -74,4 +74,4 @@ jobs:
       - name: install cargo
         uses: dtolnay/rust-toolchain@stable
       - name: Run tests
-        run: cd backend && cargo test --workspace
+        run: cd backend && SQLX_OFFLINE=true cargo test --workspace
