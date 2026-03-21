@@ -29,7 +29,8 @@ impl FromRequestParts<Arc<Service>> for AuthorizedUser {
             .await
             .map_err(|_| UsecaseError::unauthorized("unauthorized error"))?;
 
-        let access_token = jar.get("session_id")
+        let access_token = jar
+            .get("session_id")
             .map(|val| val.value().to_string())
             .unwrap_or_default();
 

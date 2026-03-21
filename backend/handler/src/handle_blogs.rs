@@ -6,8 +6,8 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tracing::error;
 
-use crate::{extractor::AuthorizedUser, model::blog::BlogResponse};
 use crate::model::image::ImageResponse;
+use crate::{extractor::AuthorizedUser, model::blog::BlogResponse};
 
 use super::error::UsecaseError;
 use super::handler::Handler;
@@ -63,11 +63,10 @@ impl Handler {
     ) -> Result<Json<ImageResponse>, UsecaseError> {
         while let Some(field) = multipart.next_field().await.unwrap() {
             let name = field.name().unwrap_or("unknown").to_string();
-            let data = field.bytes()
+            let data = field
+                .bytes()
                 .await
-                .map_err(|e| {
-                    UsecaseError::bad_request(&e.body_text())
-                })?;
+                .map_err(|e| UsecaseError::bad_request(&e.body_text()))?;
             if name != "image" {
                 continue;
             }

@@ -1,6 +1,6 @@
 use crate::error::UsecaseError;
-use crate::model::user::{LoginRequest, LoginResponse};
 use crate::extractor::AuthorizedUser;
+use crate::model::user::{LoginRequest, LoginResponse};
 
 use axum::http::StatusCode;
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
@@ -49,13 +49,13 @@ impl Handler {
 
     pub async fn logout(
         jar: CookieJar,
-        user: AuthorizedUser, 
-        state: State<Arc<Service>>
+        user: AuthorizedUser,
+        state: State<Arc<Service>>,
     ) -> Result<(CookieJar, StatusCode), UsecaseError> {
         let service = state.0.clone();
         let token = Token {
             id: user.user.id,
-            access_token: user.access_token
+            access_token: user.access_token,
         };
         service.logout(token).await?;
 

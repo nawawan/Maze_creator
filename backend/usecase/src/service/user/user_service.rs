@@ -11,7 +11,11 @@ use super::helper;
 
 #[async_trait]
 pub trait UserService {
-    async fn login(&self, username: &String, password: &String) -> Result<(Token, String), AppError>;
+    async fn login(
+        &self,
+        username: &String,
+        password: &String,
+    ) -> Result<(Token, String), AppError>;
     async fn logout(&self, access_token: Token) -> Result<(), AppError>;
     async fn get_user(&self, user_id: Uuid) -> Result<User, AppError>;
     async fn fetch_user_id_by_token(&self, access_token: String) -> Result<Uuid, AppError>;
@@ -19,7 +23,11 @@ pub trait UserService {
 
 #[async_trait]
 impl UserService for Service {
-    async fn login(&self, username: &String, password: &String) -> Result<(Token, String), AppError> {
+    async fn login(
+        &self,
+        username: &String,
+        password: &String,
+    ) -> Result<(Token, String), AppError> {
         let res = self.repository.get_user_by_username(username).await;
         let user = match res {
             Ok(user) => user,
