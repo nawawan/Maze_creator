@@ -18,6 +18,11 @@ impl UsecaseError {
             error: AppError::internal(Some(message)),
         }
     }
+    pub fn unauthorized(message: &str) -> Self {
+        UsecaseError {
+            error: AppError::unauthorized(Some(message)),
+        }
+    }
 }
 
 impl IntoResponse for UsecaseError {

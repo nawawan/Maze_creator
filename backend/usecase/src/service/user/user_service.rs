@@ -1,8 +1,9 @@
 use async_trait::async_trait;
 use std::env;
 use tracing::{error, warn};
+use uuid::Uuid;
 
-use crate::model::user::{Token, User};
+use crate::model::user::{self, Token, User};
 
 use super::super::super::errors::app_error::AppError;
 use super::super::service::Service;
@@ -11,6 +12,8 @@ use super::helper;
 #[async_trait]
 pub trait UserService {
     async fn login(&self, username: &String, password: &String) -> Result<Token, AppError>;
+    async fn get_user(&self, user_id: Uuid) -> Result<User, AppError>;
+    async fn fetch_user_id_by_token(&self, access_token: String) -> Result<Uuid, AppError>;
 }
 
 #[async_trait]
@@ -49,5 +52,20 @@ impl UserService for Service {
         let token = self.repository.create_token(user.id).await?;
 
         Ok(token)
+    }
+
+    async fn get_user(&self, user_id: Uuid) -> Result<User, AppError> {
+        let user = self.repository.get_user(user_id).await?;
+        Ok(user)
+    }
+
+    async fn fetch_user_id_by_token(&self, access_token: String) -> Result<Uuid, AppError> {
+        let user_id = self.repository.fetch_user_id_by_token(access_token).await;
+
+        if let(Some(uid)) = user_id {
+            return Ok(uid);
+        }
+
+        Err(AppError::not_found(Some("user_id is not found")))
     }
 }

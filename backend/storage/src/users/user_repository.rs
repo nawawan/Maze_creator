@@ -34,6 +34,27 @@ impl UserRepository for Repository {
         Ok(user)
     }
 
+    async fn get_user(&self, user_id: Uuid) -> Result<User, RepoError> {
+        let user = sqlx::query_as!(
+            User,
+            "SELECT id, name, password, salt FROM users WHERE id = $1",
+            user_id
+        )
+        .fetch_one(&self.pool)
+        .await
+        .map_err(|e| match e {
+            sqlx::Error::RowNotFound => {
+                RepoError::NotFound(format!("User with user_id: {} not found", user_id))
+            }
+            _ => RepoError::Internal(format!(
+                "Failed to get user by username: {}, error: {}",
+                user_id, e
+            )),
+        })?;
+
+        Ok(user) 
+    }
+
     async fn create_token(&self, user_id: Uuid) -> Result<Token, RepoError> {
         let token = Token::new(user_id.clone());
         let key: AccessToken = token.access_token.clone().into();
@@ -47,8 +68,8 @@ impl UserRepository for Repository {
         self.redis_client.delete(key).await
     }
 
-    async fn fetch_user_id_by_token(&self, token: Token) -> Option<Uuid> {
-        let key: AccessToken = token.into();
+    async fn fetch_user_id_by_token(&self, access_token: String) -> Option<Uuid> {
+        let key: AccessToken = access_token.into();
         match self.redis_client.get(key).await {
             Ok(user_id) => {
                 user_id.and_then(|uid| Uuid::from_str(&uid.inner()).ok())
@@ -105,7 +126,7 @@ mod tests {
         let current_user_id = Uuid::now_v7();
         let token = repo.create_token(current_user_id).await?;
 
-        let user_id = repo.fetch_user_id_by_token(token).await;
+        let user_id = repo.fetch_user_id_by_token(token.access_token).await;
 
         assert!(user_id.is_some());
         assert_eq!(current_user_id, user_id.unwrap());
