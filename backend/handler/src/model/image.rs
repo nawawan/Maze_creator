@@ -6,7 +6,6 @@ pub struct ImageResponse {
     pub url: String,
 }
 
-
 impl From<Image> for ImageResponse {
     fn from(image: Image) -> Self {
         ImageResponse {

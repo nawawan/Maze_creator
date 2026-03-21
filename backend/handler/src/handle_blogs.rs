@@ -1,13 +1,13 @@
 use axum::{
     Json,
-    extract::{Query, State, Multipart},
+    extract::{Multipart, Query, State},
 };
 use std::collections::HashMap;
 use std::sync::Arc;
 use tracing::error;
 
-use crate::model::blog::BlogResponse;
 use crate::model::image::ImageResponse;
+use crate::{extractor::AuthorizedUser, model::blog::BlogResponse};
 
 use super::error::UsecaseError;
 use super::handler::Handler;
@@ -37,6 +37,7 @@ impl Handler {
     }
 
     pub async fn create_blog(
+        _: AuthorizedUser,
         state: State<Arc<Service>>,
         Json(req): Json<CreateBlogRequest>,
     ) -> Result<Json<BlogResponse>, UsecaseError> {
@@ -56,17 +57,26 @@ impl Handler {
     }
 
     pub async fn upload_blog_image(
+        _: AuthorizedUser,
         state: State<Arc<Service>>,
         mut multipart: Multipart,
     ) -> Result<Json<ImageResponse>, UsecaseError> {
-        while let Some(field) = multipart.next_field().await.unwrap() {
+        while let Some(field) = multipart
+            .next_field()
+            .await
+            .map_err(|e| UsecaseError::bad_request(&e.body_text()))?
+        {
             let name = field.name().unwrap_or("unknown").to_string();
-            let data = field.bytes().await.unwrap();
+            let data = field
+                .bytes()
+                .await
+                .map_err(|e| UsecaseError::bad_request(&e.body_text()))?;
             if name != "image" {
                 continue;
             }
             let service = state.0.clone();
-            return service.upload_blog_image(data)
+            return service
+                .upload_blog_image(data)
                 .await
                 .map(|image| Json(image.into()))
                 .map_err(UsecaseError::from);

@@ -11,6 +11,12 @@ DATABASE_URL=postgres://user:postgres@localhost:5432/user SQLX_OFFLINE=true carg
 ```
 を実行することでテストを行うことができる。
 
+redisについても、docker compose up -dによって同時に建てることができ、
+```
+REDIS_URL=localhost REDIS_PORT=6379 cargo test --workspace
+```
+を実行することでテストができる。
+
 ## makeによるコマンド実行
 
 - uuidを作成するコマンド

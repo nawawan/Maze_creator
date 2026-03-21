@@ -8,15 +8,16 @@ use serde_json;
 use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
+use storage::redis::RedisClient;
 use tracing::info;
 use tracing_subscriber;
 
 use std::sync::Arc;
 
 use handler::handler::*;
+use shared::config::{Config, RedisConfig};
 use storage::repository::*;
 use usecase::service::service::*;
-use shared::config::Config;
 
 #[tokio::main]
 async fn main() {
@@ -26,15 +27,33 @@ async fn main() {
 
     let pool = initialize_db().await;
     let r2_client = initialize_cloud_storage().await;
-    let config = Config { host: env::var("PAGE_HOST").expect("PAGE_HOST must be set") };
+    let redis_client = initialize_redis();
+    let config = Config {
+        host: env::var("PAGE_HOST").expect("PAGE_HOST must be set"),
+        env: env::var("ENV").expect("ENV must be set"),
+        token_ttl: env::var("TOKEN_TTL")
+            .expect("TOKEN_TTL must be set")
+            .parse::<u64>()
+            .unwrap_or(300),
+        refresh_ttl: env::var("REFRESH_TTL")
+            .expect("REFRESH_TTL must be set")
+            .parse::<u64>()
+            .unwrap_or(300),
+    };
 
-    let repository = Box::new(Repository::new(pool.clone(), r2_client, config));
-    let service = Arc::new(Service::new(repository));
+    let repository = Box::new(Repository::new(
+        pool.clone(),
+        r2_client,
+        redis_client,
+        config.clone(),
+    ));
+    let service = Arc::new(Service::new(config, repository));
 
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
         .nest("/health", create_health_router(pool))
         .nest("/api", create_blog_router(service.clone()))
+        .nest("/users", create_users_router(service))
         .fallback(fallback);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8000")
         .await
@@ -57,16 +76,21 @@ async fn main() {
 
 fn create_blog_router(service: Arc<Service>) -> Router {
     let blog_routers = Router::new()
-        .route(
-            "/",
-            get(Handler::get_blogs).post(Handler::create_blog),
-        )
+        .route("/", get(Handler::get_blogs).post(Handler::create_blog))
         .route("/{id}", get(|| async { "Blog get by ID" }))
         .route("/images", post(Handler::upload_blog_image))
         .fallback(api_fallback)
         .with_state(service);
 
     Router::new().nest("/blogs", blog_routers)
+}
+
+fn create_users_router(service: Arc<Service>) -> Router {
+    Router::new()
+        .route("/admin/login", post(Handler::login_admin))
+        .route("/logout", post(Handler::logout))
+        .fallback(api_fallback)
+        .with_state(service)
 }
 
 fn create_health_router(pool: PgPool) -> Router {
@@ -105,6 +129,15 @@ async fn initialize_cloud_storage() -> Client {
         .load()
         .await;
     Client::new(&config)
+}
+
+fn initialize_redis() -> RedisClient {
+    let config = RedisConfig {
+        host: env::var("REDIS_HOST").expect("REDIS_HOST must be set"),
+        port: env::var("REDIS_PORT").expect("REDIS_PORT must be set"),
+    };
+
+    RedisClient::new(config).expect("creating redis client failed")
 }
 
 async fn fallback() -> (StatusCode, &'static str) {

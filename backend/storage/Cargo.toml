@@ -18,3 +18,4 @@ uuid.workspace = true
 mockall.workspace = true
 tokio.workspace = true
 bytes.workspace = true
+redis.workspace = true
