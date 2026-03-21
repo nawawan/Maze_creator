@@ -3,6 +3,7 @@ use crate::model::user::{LoginRequest, LoginResponse};
 use crate::extractor::AuthorizedUser;
 
 use axum::http::StatusCode;
+use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use usecase::model::user::Token;
 use usecase::service::service::Service;
 use usecase::service::user::user_service::UserService;
@@ -14,9 +15,10 @@ use tracing::error;
 
 impl Handler {
     pub async fn login_admin(
+        jar: CookieJar,
         state: State<Arc<Service>>,
         Json(req): Json<LoginRequest>,
-    ) -> Result<Json<LoginResponse>, UsecaseError> {
+    ) -> Result<Json<(CookieJar, LoginResponse)>, UsecaseError> {
         let service = state.0.clone();
 
         let (username, password) = (req.username, req.password);
@@ -26,7 +28,21 @@ impl Handler {
             error!("Failed to login: {}", e.message);
         }
         let token = result?;
-        Ok(Json(token.into()))
+
+        let session_cookie = Cookie::build(("session_id", token.access_token))
+            .http_only(true)
+            .secure(true)
+            .same_site(SameSite::Strict)
+            .build();
+
+        let refresh_cookie = Cookie::build("refresh_token")
+            .http_only(true)
+            .secure(true)
+            .same_site(SameSite::Strict)
+            .build();
+
+        let jar = jar.add(session_cookie).add(refresh_cookie);
+        Ok(Json((jar, token.into())))
     }
 
     pub async fn logout(

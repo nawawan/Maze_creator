@@ -55,11 +55,11 @@ impl UserRepository for Repository {
         Ok(user)
     }
 
-    async fn create_token(&self, user_id: Uuid) -> Result<Token, RepoError> {
+    async fn create_token(&self, user_id: Uuid, ttl: u64) -> Result<Token, RepoError> {
         let token = Token::new(user_id.clone());
         let key: AccessToken = token.access_token.clone().into();
         let val: AuthorizedUserId = user_id.into();
-        self.redis_client.set_ex(&key, &val, 300).await?;
+        self.redis_client.set_ex(&key, &val, ttl).await?;
         Ok(token)
     }
 
@@ -97,7 +97,7 @@ mod tests {
         let repo = initialize_repository().await;
 
         let current_user_id = Uuid::now_v7();
-        let token = repo.create_token(current_user_id).await?;
+        let token = repo.create_token(current_user_id, 300).await?;
 
         assert_eq!(current_user_id, token.id);
         Ok(())
@@ -108,7 +108,7 @@ mod tests {
         let repo = initialize_repository().await;
 
         let current_user_id = Uuid::now_v7();
-        let token = repo.create_token(current_user_id).await?;
+        let token = repo.create_token(current_user_id, 300).await?;
 
         let deleted_item_num = repo.delete_token(token).await?;
 
@@ -121,7 +121,7 @@ mod tests {
         let repo = initialize_repository().await;
 
         let current_user_id = Uuid::now_v7();
-        let token = repo.create_token(current_user_id).await?;
+        let token = repo.create_token(current_user_id, 300).await?;
 
         let user_id = repo.fetch_user_id_by_token(token.access_token).await;
 

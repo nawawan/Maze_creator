@@ -19,7 +19,7 @@ pub trait UserService {
 
 #[async_trait]
 impl UserService for Service {
-    async fn login(&self, username: &String, password: &String) -> Result<Token, AppError> {
+    async fn login(&self, username: &String, password: &String) -> Result<(Token, String), AppError> {
         let res = self.repository.get_user_by_username(username).await;
         let user = match res {
             Ok(user) => user,
@@ -50,9 +50,10 @@ impl UserService for Service {
             )));
         }
 
-        let token = self.repository.create_token(user.id).await?;
+        let token = self.repository.create_token(user.id, 900).await?;
+        let refresh_token = self.repository.create_token(user.id, 86400).await?;
 
-        Ok(token)
+        Ok((token, refresh_token.access_token))
     }
 
     async fn logout(&self, token: Token) -> Result<(), AppError> {
