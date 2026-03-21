@@ -10,12 +10,6 @@ on:
       - nginx/**
       - ".github/**"
       - ".gitignore"
-  pull_request:
-    paths-ignore:
-      - frontend/**
-      - "README.md"
-      - ".github/**"
-      - ".gitignore"
 
 jobs:
   lint:
