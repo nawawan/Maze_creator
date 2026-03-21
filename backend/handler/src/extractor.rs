@@ -2,6 +2,7 @@ use axum::RequestPartsExt;
 use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
 use axum_extra::TypedHeader;
+use axum_extra::extract::CookieJar;
 use axum_extra::headers::Authorization;
 use axum_extra::headers::authorization::Bearer;
 use std::sync::Arc;
@@ -24,12 +25,13 @@ impl FromRequestParts<Arc<Service>> for AuthorizedUser {
         parts: &mut Parts,
         service: &Arc<Service>,
     ) -> Result<Self, Self::Rejection> {
-        let TypedHeader(Authorization(bearer)) = parts
-            .extract::<TypedHeader<Authorization<Bearer>>>()
+        let jar = CookieJar::from_request_parts(parts, service)
             .await
             .map_err(|_| UsecaseError::unauthorized("unauthorized error"))?;
 
-        let access_token = bearer.token().to_string();
+        let access_token = jar.get("session_id")
+            .map(|val| val.value().to_string())
+            .unwrap_or_default();
 
         let user_id = service
             .fetch_user_id_by_token(access_token.clone())

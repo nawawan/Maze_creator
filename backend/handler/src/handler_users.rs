@@ -18,7 +18,7 @@ impl Handler {
         jar: CookieJar,
         state: State<Arc<Service>>,
         Json(req): Json<LoginRequest>,
-    ) -> Result<Json<(CookieJar, LoginResponse)>, UsecaseError> {
+    ) -> Result<(CookieJar, Json<LoginResponse>), UsecaseError> {
         let service = state.0.clone();
 
         let (username, password) = (req.username, req.password);
@@ -27,22 +27,22 @@ impl Handler {
         if let Err(ref e) = result {
             error!("Failed to login: {}", e.message);
         }
-        let token = result?;
+        let (token, refresh_token) = result?;
 
-        let session_cookie = Cookie::build(("session_id", token.access_token))
+        let session_cookie = Cookie::build(("session_id", token.access_token.clone()))
             .http_only(true)
             .secure(true)
             .same_site(SameSite::Strict)
             .build();
 
-        let refresh_cookie = Cookie::build("refresh_token")
+        let refresh_cookie = Cookie::build(("refresh_token", refresh_token))
             .http_only(true)
             .secure(true)
             .same_site(SameSite::Strict)
             .build();
 
         let jar = jar.add(session_cookie).add(refresh_cookie);
-        Ok(Json((jar, token.into())))
+        Ok((jar, Json(token.into())))
     }
 
     pub async fn logout(

@@ -11,7 +11,7 @@ use super::helper;
 
 #[async_trait]
 pub trait UserService {
-    async fn login(&self, username: &String, password: &String) -> Result<Token, AppError>;
+    async fn login(&self, username: &String, password: &String) -> Result<(Token, String), AppError>;
     async fn logout(&self, access_token: Token) -> Result<(), AppError>;
     async fn get_user(&self, user_id: Uuid) -> Result<User, AppError>;
     async fn fetch_user_id_by_token(&self, access_token: String) -> Result<Uuid, AppError>;
