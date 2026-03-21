@@ -1,4 +1,4 @@
-import { Box, Button, Paper, Typography } from "@mui/material";
+import { Box, Button, ButtonBase, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 
 type Blog = {
@@ -10,10 +10,11 @@ type Blog = {
 type AdminHomeProps = {
   posts: Blog[];
   onWriteClick?: () => void;
+  onPostClick?: (id: string) => void;
 };
 
 function AdminHome(props: AdminHomeProps) {
-  const { posts, onWriteClick } = props;
+  const { posts, onWriteClick, onPostClick } = props;
   return (
     <Box sx={{ p: 4 }}>
       <Box
@@ -43,10 +44,18 @@ function AdminHome(props: AdminHomeProps) {
         }}
       >
         {posts.map((post) => (
-          <Paper
+          <ButtonBase
             key={post.id}
-            elevation={0}
-            sx={{ bgcolor: "grey.300", px: 2, py: 2 }}
+            onClick={() => onPostClick?.(post.id)}
+            sx={{
+              display: "block",
+              width: "100%",
+              textAlign: "left",
+              bgcolor: "grey.300",
+              px: 2,
+              py: 2,
+              borderRadius: 1,
+            }}
           >
             <Typography variant="subtitle1" fontWeight={600}>
               {post.title}
@@ -54,7 +63,7 @@ function AdminHome(props: AdminHomeProps) {
             <Typography variant="body2" color="text.secondary">
               {post.date}
             </Typography>
-          </Paper>
+          </ButtonBase>
         ))}
       </Box>
     </Box>

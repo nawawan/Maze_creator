@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Paper, Typography } from "@mui/material";
+import { Box, Button, ButtonBase, Divider, Typography } from "@mui/material";
 
 type HomePageProps = {
   contents: {
@@ -7,10 +7,11 @@ type HomePageProps = {
     date: string;
   }[];
   onLoginClick?: () => void;
+  onContentClick?: (id: string) => void;
 };
 
 function HomePage(props: HomePageProps) {
-  const { contents, onLoginClick } = props;
+  const { contents, onLoginClick, onContentClick } = props;
   return (
     <Box sx={{ p: 4 }}>
       <Box
@@ -38,10 +39,18 @@ function HomePage(props: HomePageProps) {
         }}
       >
         {contents.map((content) => (
-          <Paper
+          <ButtonBase
             key={content.id}
-            elevation={0}
-            sx={{ bgcolor: "grey.300", px: 2, py: 2 }}
+            onClick={() => onContentClick?.(content.id)}
+            sx={{
+              display: "block",
+              width: "100%",
+              textAlign: "left",
+              bgcolor: "grey.300",
+              px: 2,
+              py: 2,
+              borderRadius: 1,
+            }}
           >
             <Typography variant="subtitle1" fontWeight={600}>
               {content.title}
@@ -49,7 +58,7 @@ function HomePage(props: HomePageProps) {
             <Typography variant="body2" color="text.secondary">
               {content.date}
             </Typography>
-          </Paper>
+          </ButtonBase>
         ))}
       </Box>
     </Box>
