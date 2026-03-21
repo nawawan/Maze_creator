@@ -4,6 +4,7 @@ use axum::http::request::Parts;
 use axum_extra::TypedHeader;
 use axum_extra::headers::Authorization;
 use axum_extra::headers::authorization::Bearer;
+use std::sync::Arc;
 
 use usecase::model::user::User;
 use usecase::service::service::Service;
@@ -16,12 +17,12 @@ pub struct AuthorizedUser {
     pub user: User,
 }
 
-impl FromRequestParts<Service> for AuthorizedUser {
+impl FromRequestParts<Arc<Service>> for AuthorizedUser {
     type Rejection = UsecaseError;
 
     async fn from_request_parts(
         parts: &mut Parts,
-        service: &Service,
+        service: &Arc<Service>,
     ) -> Result<Self, Self::Rejection> {
         let TypedHeader(Authorization(bearer)) = parts
             .extract::<TypedHeader<Authorization<Bearer>>>()

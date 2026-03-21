@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tracing::error;
 
-use crate::model::blog::BlogResponse;
+use crate::{extractor::AuthorizedUser, model::blog::BlogResponse};
 use crate::model::image::ImageResponse;
 
 use super::error::UsecaseError;
@@ -37,6 +37,7 @@ impl Handler {
     }
 
     pub async fn create_blog(
+        _: AuthorizedUser,
         state: State<Arc<Service>>,
         Json(req): Json<CreateBlogRequest>,
     ) -> Result<Json<BlogResponse>, UsecaseError> {
@@ -56,6 +57,7 @@ impl Handler {
     }
 
     pub async fn upload_blog_image(
+        _: AuthorizedUser,
         state: State<Arc<Service>>,
         mut multipart: Multipart,
     ) -> Result<Json<ImageResponse>, UsecaseError> {

@@ -79,6 +79,7 @@ fn create_blog_router(service: Arc<Service>) -> Router {
 fn create_users_router(service: Arc<Service>) -> Router {
     Router::new()
         .route("/admin/login", post(Handler::login_admin))
+        .route("/logout", post(Handler::logout))
         .fallback(api_fallback)
         .with_state(service)
 }
