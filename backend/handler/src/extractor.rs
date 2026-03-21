@@ -34,12 +34,12 @@ impl FromRequestParts<Arc<Service>> for AuthorizedUser {
         let user_id = service
             .fetch_user_id_by_token(access_token.clone())
             .await
-            .map_err(|e| UsecaseError::unauthorized(&e.message))?;
+            .map_err(|_| UsecaseError::unauthorized("unauthorized error"))?;
 
         let user = service
             .get_user(user_id)
             .await
-            .map_err(|e| UsecaseError::unauthorized(&e.message))?;
+            .map_err(|_| UsecaseError::unauthorized("unauthorized error"))?;
 
         Ok(Self { access_token, user })
     }

@@ -63,7 +63,11 @@ impl Handler {
     ) -> Result<Json<ImageResponse>, UsecaseError> {
         while let Some(field) = multipart.next_field().await.unwrap() {
             let name = field.name().unwrap_or("unknown").to_string();
-            let data = field.bytes().await.unwrap();
+            let data = field.bytes()
+                .await
+                .map_err(|e| {
+                    UsecaseError::bad_request(&e.body_text())
+                })?;
             if name != "image" {
                 continue;
             }
