@@ -97,7 +97,7 @@ mod tests {
         let repo = initialize_repository().await;
 
         let current_user_id = Uuid::now_v7();
-        let token = repo.create_token(current_user_id, 300).await?;
+        let token = repo.create_token(current_user_id, repo.config.token_ttl).await?;
 
         assert_eq!(current_user_id, token.id);
         Ok(())
@@ -108,7 +108,7 @@ mod tests {
         let repo = initialize_repository().await;
 
         let current_user_id = Uuid::now_v7();
-        let token = repo.create_token(current_user_id, 300).await?;
+        let token = repo.create_token(current_user_id, repo.config.token_ttl).await?;
 
         let deleted_item_num = repo.delete_token(token).await?;
 
@@ -121,7 +121,7 @@ mod tests {
         let repo = initialize_repository().await;
 
         let current_user_id = Uuid::now_v7();
-        let token = repo.create_token(current_user_id, 300).await?;
+        let token = repo.create_token(current_user_id, repo.config.token_ttl).await?;
 
         let user_id = repo.fetch_user_id_by_token(token.access_token).await;
 
@@ -137,6 +137,9 @@ mod tests {
             initialize_redis().await,
             Config {
                 host: "test".into(),
+                env: "dev".into(),
+                token_ttl: 300,
+                refresh_ttl: 900,
             },
         );
 

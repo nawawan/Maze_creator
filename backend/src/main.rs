@@ -30,15 +30,18 @@ async fn main() {
     let redis_client = initialize_redis();
     let config = Config {
         host: env::var("PAGE_HOST").expect("PAGE_HOST must be set"),
+        env: env::var("ENV").expect("ENV must be set"),
+        token_ttl: env::var("TOKEN_TTL").expect("TOKEN_TTL must be set").parse::<u64>().unwrap_or(300),
+        refresh_ttl: env::var("REFRESH_TTL").expect("REFRESH_TTL must be set").parse::<u64>().unwrap_or(300),
     };
 
     let repository = Box::new(Repository::new(
         pool.clone(),
         r2_client,
         redis_client,
-        config,
+        config.clone(),
     ));
-    let service = Arc::new(Service::new(repository));
+    let service = Arc::new(Service::new(config, repository));
 
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))

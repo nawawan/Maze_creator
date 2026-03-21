@@ -126,6 +126,9 @@ mod tests {
             .expect("test"),
             Config {
                 host: "test".into(),
+                env: "dev".into(),
+                token_ttl: 300,
+                refresh_ttl: 900,
             },
         );
 
@@ -152,6 +155,9 @@ mod tests {
             .expect("test"),
             Config {
                 host: "test".into(),
+                env: "dev".into(),
+                token_ttl: 300,
+                refresh_ttl: 900,
             },
         );
         let blog = Blog {

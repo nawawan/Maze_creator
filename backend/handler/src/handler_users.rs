@@ -28,18 +28,19 @@ impl Handler {
             error!("Failed to login: {}", e.message);
         }
         let (token, refresh_token) = result?;
+        let is_prod = service.config.env == "prod".to_string();
 
         let session_cookie = Cookie::build(("session_id", token.access_token.clone()))
             .path("/")
             .http_only(true)
-            .secure(true)
+            .secure(is_prod)
             .same_site(SameSite::Strict)
             .build();
 
         let refresh_cookie = Cookie::build(("refresh_token", refresh_token))
             .path("/users")
             .http_only(true)
-            .secure(true)
+            .secure(is_prod)
             .same_site(SameSite::Strict)
             .build();
 
