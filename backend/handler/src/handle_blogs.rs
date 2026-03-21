@@ -1,6 +1,6 @@
 use axum::{
     Json,
-    extract::{Query, State, Multipart},
+    extract::{Multipart, Query, State},
 };
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -66,7 +66,8 @@ impl Handler {
                 continue;
             }
             let service = state.0.clone();
-            return service.upload_blog_image(data)
+            return service
+                .upload_blog_image(data)
                 .await
                 .map(|image| Json(image.into()))
                 .map_err(UsecaseError::from);

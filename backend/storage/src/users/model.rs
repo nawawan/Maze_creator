@@ -7,7 +7,6 @@ use uuid::Uuid;
 pub struct AccessToken(pub String);
 pub struct AuthorizedUserId(pub String);
 
-
 impl From<Token> for AccessToken {
     fn from(value: Token) -> Self {
         Self(value.access_token)

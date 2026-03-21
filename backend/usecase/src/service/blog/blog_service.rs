@@ -1,12 +1,12 @@
 use crate::errors::app_error::AppError;
-use crate::model::image::Image;
 use crate::model::blog::{Blog, BlogFilter, BlogRequest, BlogStatus};
+use crate::model::image::Image;
 
 use super::super::service::Service;
 use async_trait::async_trait;
+use bytes::Bytes;
 use std::env;
 use tracing::error;
-use bytes::Bytes;
 use uuid::Uuid;
 
 #[async_trait]
@@ -71,7 +71,6 @@ impl BlogService for Service {
 
         result
     }
-
 
     async fn upload_blog_image(&self, image_data: Bytes) -> Result<Image, AppError> {
         let image_id = Uuid::now_v7().to_string().replace("-", "");

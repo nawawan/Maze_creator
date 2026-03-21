@@ -62,7 +62,7 @@ impl UserService for Service {
     async fn fetch_user_id_by_token(&self, access_token: String) -> Result<Uuid, AppError> {
         let user_id = self.repository.fetch_user_id_by_token(access_token).await;
 
-        if let(Some(uid)) = user_id {
+        if let Some(uid) = user_id {
             return Ok(uid);
         }
 

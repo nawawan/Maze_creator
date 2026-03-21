@@ -1,9 +1,9 @@
+use axum::RequestPartsExt;
 use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
-use axum::{RequestPartsExt};
-use axum_extra::headers::authorization::Bearer;
-use axum_extra::headers::Authorization;
 use axum_extra::TypedHeader;
+use axum_extra::headers::Authorization;
+use axum_extra::headers::authorization::Bearer;
 
 use usecase::model::user::User;
 use usecase::service::service::Service;
@@ -12,7 +12,7 @@ use usecase::service::user::user_service::UserService;
 use crate::error::UsecaseError;
 
 pub struct AuthorizedUser {
-    pub access_token : String,
+    pub access_token: String,
     pub user: User,
 }
 
@@ -43,4 +43,3 @@ impl FromRequestParts<Service> for AuthorizedUser {
         Ok(Self { access_token, user })
     }
 }
-

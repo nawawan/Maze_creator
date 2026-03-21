@@ -1,5 +1,5 @@
+use crate::error::UsecaseError;
 use crate::model::user::{LoginRequest, LoginResponse};
-use crate::{error::UsecaseError};
 
 use super::handler::Handler;
 use axum::extract::{Json, State};

@@ -1,8 +1,8 @@
-use aws_sdk_s3::Client;
-use sqlx::PgPool;
 use crate::redis::RedisClient;
-use usecase::repository::repositories::Repositories;
+use aws_sdk_s3::Client;
 use shared::config::Config;
+use sqlx::PgPool;
+use usecase::repository::repositories::Repositories;
 
 pub struct Repository {
     pub pool: PgPool,
@@ -13,7 +13,12 @@ pub struct Repository {
 
 impl Repository {
     pub fn new(pool: PgPool, r2_client: Client, redis_client: RedisClient, config: Config) -> Self {
-        Self { pool, r2_client, redis_client, config }
+        Self {
+            pool,
+            r2_client,
+            redis_client,
+            config,
+        }
     }
 }
 

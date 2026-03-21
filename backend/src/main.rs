@@ -7,17 +7,17 @@ use dotenv::dotenv;
 use serde_json;
 use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
-use storage::redis::RedisClient;
 use std::env;
+use storage::redis::RedisClient;
 use tracing::info;
 use tracing_subscriber;
 
 use std::sync::Arc;
 
 use handler::handler::*;
+use shared::config::{Config, RedisConfig};
 use storage::repository::*;
 use usecase::service::service::*;
-use shared::config::{Config, RedisConfig};
 
 #[tokio::main]
 async fn main() {
@@ -28,9 +28,16 @@ async fn main() {
     let pool = initialize_db().await;
     let r2_client = initialize_cloud_storage().await;
     let redis_client = initialize_redis();
-    let config = Config { host: env::var("PAGE_HOST").expect("PAGE_HOST must be set") };
+    let config = Config {
+        host: env::var("PAGE_HOST").expect("PAGE_HOST must be set"),
+    };
 
-    let repository = Box::new(Repository::new(pool.clone(), r2_client, redis_client, config));
+    let repository = Box::new(Repository::new(
+        pool.clone(),
+        r2_client,
+        redis_client,
+        config,
+    ));
     let service = Arc::new(Service::new(repository));
 
     let app = Router::new()
@@ -60,10 +67,7 @@ async fn main() {
 
 fn create_blog_router(service: Arc<Service>) -> Router {
     let blog_routers = Router::new()
-        .route(
-            "/",
-            get(Handler::get_blogs).post(Handler::create_blog),
-        )
+        .route("/", get(Handler::get_blogs).post(Handler::create_blog))
         .route("/{id}", get(|| async { "Blog get by ID" }))
         .route("/images", post(Handler::upload_blog_image))
         .fallback(api_fallback)

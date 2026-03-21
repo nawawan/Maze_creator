@@ -9,7 +9,7 @@ pub struct StorageConfig {
 }
 
 pub struct Config {
-    pub host: String
+    pub host: String,
 }
 
 pub struct RedisConfig {

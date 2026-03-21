@@ -1,6 +1,6 @@
 use super::super::repository::*;
-use aws_sdk_s3::primitives::ByteStream;
 use aws_sdk_s3::error::ProvideErrorMetadata;
+use aws_sdk_s3::primitives::ByteStream;
 use tracing::error;
 use usecase::errors::repo_error::RepoError;
 use usecase::model::blog::{Blog, BlogFilter};
@@ -68,10 +68,13 @@ impl BlogRepository for Repository {
             .await
             .map_err(|e| {
                 error!(image_id = %image_id, error = %e);
-                error!(code=e.code(), message=e.message().unwrap_or("No error message"));
+                error!(
+                    code = e.code(),
+                    message = e.message().unwrap_or("No error message")
+                );
                 RepoError::Internal("Failed to upload image".to_string())
             })?;
-            
+
         Ok(Image {
             id: image_id.clone(),
             url: format!("{}/images/{}", self.config.host, image_id),
@@ -104,10 +107,10 @@ mod tests {
 
     use super::*;
     use anyhow::Result;
+    use anyhow::anyhow;
     use aws_config::BehaviorVersion;
     use aws_sdk_s3::Client;
     use shared::config::Config;
-    use anyhow::anyhow;
     use uuid::Uuid;
 
     #[sqlx::test(migrations = "../src/migrations")]
@@ -115,8 +118,15 @@ mod tests {
         let repo = Repository::new(
             pool,
             Client::new(&aws_config::load_defaults(BehaviorVersion::latest()).await),
-            RedisClient::new(RedisConfig{host: "test".to_string(), port: "6937".to_string()}).map_err(|e| anyhow!("uni")).expect("test"),
-            Config { host: "test".into() }
+            RedisClient::new(RedisConfig {
+                host: "test".to_string(),
+                port: "6937".to_string(),
+            })
+            .map_err(|e| anyhow!("uni"))
+            .expect("test"),
+            Config {
+                host: "test".into(),
+            },
         );
 
         let mut tx = repo.pool.begin().await?;
@@ -134,8 +144,15 @@ mod tests {
         let repo = Repository::new(
             pool,
             Client::new(&aws_config::load_defaults(BehaviorVersion::latest()).await),
-            RedisClient::new(RedisConfig{host: "test".to_string(), port: "6937".to_string()}).map_err(|e| anyhow!("uni")).expect("test"),
-            Config { host: "test".into() }
+            RedisClient::new(RedisConfig {
+                host: "test".to_string(),
+                port: "6937".to_string(),
+            })
+            .map_err(|e| anyhow!("uni"))
+            .expect("test"),
+            Config {
+                host: "test".into(),
+            },
         );
         let blog = Blog {
             id: Uuid::now_v7(),
