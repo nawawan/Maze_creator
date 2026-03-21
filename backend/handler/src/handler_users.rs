@@ -30,12 +30,14 @@ impl Handler {
         let (token, refresh_token) = result?;
 
         let session_cookie = Cookie::build(("session_id", token.access_token.clone()))
+            .path("/")
             .http_only(true)
             .secure(true)
             .same_site(SameSite::Strict)
             .build();
 
         let refresh_cookie = Cookie::build(("refresh_token", refresh_token))
+            .path("/users")
             .http_only(true)
             .secure(true)
             .same_site(SameSite::Strict)
@@ -56,7 +58,7 @@ impl Handler {
             access_token: user.access_token
         };
         service.logout(token).await?;
-        
+
         let jar = jar.remove("session_id").remove("refresh_token");
 
         Ok((jar, StatusCode::NO_CONTENT))
