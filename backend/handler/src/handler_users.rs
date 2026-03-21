@@ -46,16 +46,19 @@ impl Handler {
     }
 
     pub async fn logout(
+        jar: CookieJar,
         user: AuthorizedUser, 
         state: State<Arc<Service>>
-    ) -> Result<StatusCode, UsecaseError> {
+    ) -> Result<(CookieJar, StatusCode), UsecaseError> {
         let service = state.0.clone();
         let token = Token {
             id: user.user.id,
             access_token: user.access_token
         };
         service.logout(token).await?;
+        
+        let jar = jar.remove("session_id").remove("refresh_token");
 
-        Ok(StatusCode::NO_CONTENT)
+        Ok((jar, StatusCode::NO_CONTENT))
     }
 }
