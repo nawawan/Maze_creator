@@ -18,7 +18,7 @@ impl Handler {
         jar: CookieJar,
         state: State<Arc<Service>>,
         Json(req): Json<LoginRequest>,
-    ) -> Result<(CookieJar, Json<LoginResponse>), UsecaseError> {
+    ) -> Result<(CookieJar, StatusCode), UsecaseError> {
         let service = state.0.clone();
 
         let (username, password) = (req.username, req.password);
@@ -45,7 +45,7 @@ impl Handler {
             .build();
 
         let jar = jar.add(session_cookie).add(refresh_cookie);
-        Ok((jar, Json(token.into())))
+        Ok((jar, StatusCode::OK))
     }
 
     pub async fn logout(
