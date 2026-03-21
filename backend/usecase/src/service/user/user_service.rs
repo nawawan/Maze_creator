@@ -58,8 +58,14 @@ impl UserService for Service {
             )));
         }
 
-        let token = self.repository.create_token(user.id, self.config.token_ttl).await?;
-        let refresh_token = self.repository.create_token(user.id, self.config.refresh_ttl).await?;
+        let token = self
+            .repository
+            .create_token(user.id, self.config.token_ttl)
+            .await?;
+        let refresh_token = self
+            .repository
+            .create_token(user.id, self.config.refresh_ttl)
+            .await?;
 
         Ok((token, refresh_token.access_token))
     }

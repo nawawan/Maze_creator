@@ -31,8 +31,14 @@ async fn main() {
     let config = Config {
         host: env::var("PAGE_HOST").expect("PAGE_HOST must be set"),
         env: env::var("ENV").expect("ENV must be set"),
-        token_ttl: env::var("TOKEN_TTL").expect("TOKEN_TTL must be set").parse::<u64>().unwrap_or(300),
-        refresh_ttl: env::var("REFRESH_TTL").expect("REFRESH_TTL must be set").parse::<u64>().unwrap_or(300),
+        token_ttl: env::var("TOKEN_TTL")
+            .expect("TOKEN_TTL must be set")
+            .parse::<u64>()
+            .unwrap_or(300),
+        refresh_ttl: env::var("REFRESH_TTL")
+            .expect("REFRESH_TTL must be set")
+            .parse::<u64>()
+            .unwrap_or(300),
     };
 
     let repository = Box::new(Repository::new(

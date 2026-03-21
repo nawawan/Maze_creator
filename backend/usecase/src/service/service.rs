@@ -1,5 +1,5 @@
 use crate::repository::repositories::Repositories;
-use shared::config::Config;     
+use shared::config::Config;
 pub struct Service {
     pub config: Config,
     pub repository: Box<dyn Repositories>,
