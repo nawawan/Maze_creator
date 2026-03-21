@@ -15,7 +15,7 @@ struct ErrorBody {
 impl UsecaseError {
     pub fn bad_request(message: &str) -> Self {
         UsecaseError {
-            error: AppError::internal(Some(message)),
+            error: AppError::invalid(Some(message)),
         }
     }
     pub fn unauthorized(message: &str) -> Self {
