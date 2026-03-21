@@ -10,7 +10,7 @@
     "preview": "wrangler deploy --env preview",
     "lint": "eslint .",
     "formatter": "npx prettier ./src --write",
-    "storybook": "storybook dev -p 6006",
+    "start": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "dependencies": {
