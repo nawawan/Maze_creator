@@ -2,12 +2,10 @@ name: Backend CICD
 run-name: deploy backend app to cloud run
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - feature/**
+  pull_request:
     paths-ignore:
       - frontend/**
-      - nginx/**
+      - "README.md"
       - ".github/**"
       - ".gitignore"
 

@@ -2,11 +2,9 @@ name: Maze Creator CICD
 run-name: deploy maze-creator app to cloudflare workers
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - "feature/**"
+  pull_request:
     paths-ignore:
-      - backend/**
+      - "backend/**"
       - "README.md"
       - ".github/**"
       - ".gitignore"
