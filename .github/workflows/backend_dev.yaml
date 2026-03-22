@@ -2,17 +2,9 @@ name: Backend CICD
 run-name: deploy backend app to cloud run
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - feature/**
-    paths-ignore:
-      - frontend/**
-      - nginx/**
-      - ".github/**"
-      - ".gitignore"
   pull_request:
     paths-ignore:
-      - "backend/**"
+      - frontend/**
       - "README.md"
       - ".github/**"
       - ".gitignore"
@@ -74,4 +66,4 @@ jobs:
       - name: install cargo
         uses: dtolnay/rust-toolchain@stable
       - name: Run tests
-        run: cd backend && cargo test --workspace
+        run: cd backend && SQLX_OFFLINE=true cargo test --workspace

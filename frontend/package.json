@@ -10,7 +10,7 @@
     "preview": "wrangler deploy --env preview",
     "lint": "eslint .",
     "formatter": "npx prettier ./src --write",
-    "storybook": "storybook dev -p 6006",
+    "start": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "dependencies": {
@@ -20,6 +20,7 @@
     "@mui/material": "^7.3.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-router-dom": "^7.13.1",
     "vite-plugin-top-level-await": "^1.6.0",
     "vite-plugin-wasm": "^3.5.0",
     "wrangler": "^4.34.0"
