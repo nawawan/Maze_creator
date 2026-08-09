@@ -12,6 +12,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
     args: {
         id: "test",
-        onSave: (markdown: string, id: string) => alert(markdown + id),
+        tag: "TECH",
+        onSave: async (markdown: string, id: string) => { alert(markdown + id); },
     },
 };

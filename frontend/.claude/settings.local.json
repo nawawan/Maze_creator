@@ -4,6 +4,15 @@
       "Bash(grep -E \"\\\\.\\(ts|tsx|js\\)$\")",
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
+      "Bash(git push origin *)",
+      "Bash(git pull origin *)",
+      "Bash(git checkout -b *)",
+      "Bash(git checkout *)",
+      "Bash(git status)",
+      "Bash(git diff)",
+      "Bash(git log)",
+      "Bash(npn run *)",
+      "Bash(npm test)",
       "mcp__plugin_figma_figma__use_figma"
     ]
   }

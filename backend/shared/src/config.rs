@@ -14,6 +14,7 @@ pub struct Config {
     pub env: String,
     pub cf_access_team_domain: String,
     pub cf_access_aud: String,
+    pub blog_r2_bucket: String,
 }
 
 impl DatabaseConfig {

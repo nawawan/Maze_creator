@@ -16,6 +16,7 @@ const EditorPanePreview = ({ initialMarkdown }: { initialMarkdown: string }) => 
     const preRef = useRef<HTMLPreElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [markdown, setMarkdown] = useState(initialMarkdown);
+    const [lineWraps, setLineWraps] = useState<number[]>([]);
 
     const handleScroll = () => {
         const scrollTop = textareaRef.current?.scrollTop ?? 0;
@@ -30,6 +31,7 @@ const EditorPanePreview = ({ initialMarkdown }: { initialMarkdown: string }) => 
             textareaRef={textareaRef}
             markdown={markdown}
             lineCount={Math.max(markdown.split('\n').length, 1)}
+            lineWraps={lineWraps}
             onChange={e => setMarkdown(e.target.value)}
             onScroll={handleScroll}
             onInsert={(newMarkdown, cursorPos) => {
@@ -41,6 +43,7 @@ const EditorPanePreview = ({ initialMarkdown }: { initialMarkdown: string }) => 
                     }
                 }, 0);
             }}
+            onLineWrapsChange={setLineWraps}
         />
     );
 };

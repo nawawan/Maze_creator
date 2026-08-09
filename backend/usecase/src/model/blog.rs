@@ -30,6 +30,40 @@ impl From<String> for BlogStatus {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "UPPERCASE")]
+pub enum BlogTag {
+    Travel,
+    Retrospective,
+    Diary,
+    Tech,
+}
+
+impl fmt::Display for BlogTag {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            BlogTag::Travel => write!(f, "TRAVEL"),
+            BlogTag::Retrospective => write!(f, "RETROSPECTIVE"),
+            BlogTag::Diary => write!(f, "DIARY"),
+            BlogTag::Tech => write!(f, "TECH"),
+        }
+    }
+}
+
+impl TryFrom<String> for BlogTag {
+    type Error = String;
+
+    fn try_from(tag: String) -> Result<Self, Self::Error> {
+        match tag.as_str() {
+            "TRAVEL" => Ok(BlogTag::Travel),
+            "RETROSPECTIVE" => Ok(BlogTag::Retrospective),
+            "DIARY" => Ok(BlogTag::Diary),
+            "TECH" => Ok(BlogTag::Tech),
+            _ => Err(format!("Unknown blog tag: {}", tag)),
+        }
+    }
+}
+
 #[derive(Debug, Clone, sqlx::FromRow)]
 pub struct Blog {
     pub id: Uuid,
@@ -38,6 +72,8 @@ pub struct Blog {
     pub slug: String,
     #[sqlx(try_from = "String")]
     pub status: BlogStatus,
+    pub published_at: Option<NaiveDateTime>,
+    pub tag: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -46,6 +82,8 @@ pub struct BlogRequest {
     pub title: Option<String>,
     pub slug: Option<String>,
     pub content: String,
+    pub status: Option<BlogStatus>,
+    pub tag: Option<String>,
 }
 
 pub struct BlogFilter {
@@ -55,6 +93,8 @@ pub struct BlogFilter {
     pub order_desc: Option<bool>,
     pub start: Option<NaiveDateTime>,
     pub end: Option<NaiveDateTime>,
+    pub status: Option<BlogStatus>,
+    pub tag: Option<String>,
 }
 
 impl Blog {
@@ -64,15 +104,22 @@ impl Blog {
 }
 
 impl BlogFilter {
-    pub fn new(year: Option<&String>, month: Option<&String>) -> Self {
+    pub fn new(
+        year: Option<&String>,
+        month: Option<&String>,
+        status: Option<BlogStatus>,
+        tag: Option<&String>,
+    ) -> Self {
         let (start, end) = converter_string_to_datetime(year, month);
         Self {
             start,
             end,
+            tag: tag.cloned(),
             order_by: None,
             limit: None,
             offset: None,
             order_desc: None,
+            status,
         }
     }
 
@@ -82,6 +129,12 @@ impl BlogFilter {
         }
         if let Some(end) = self.end {
             query.push(" AND created_at <= ").push_bind(end);
+        }
+        if let Some(status) = &self.status {
+            query.push(" AND status = ").push_bind(status.to_string());
+        }
+        if let Some(tag) = &self.tag {
+            query.push(" AND tag = ").push_bind(tag.clone());
         }
         if let Some(order_by) = &self.order_by {
             query.push(" ORDER BY ").push(order_by);

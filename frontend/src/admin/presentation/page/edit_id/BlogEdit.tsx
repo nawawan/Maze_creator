@@ -11,13 +11,11 @@ const EditBlog = (props: EditBlogProps) => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh',
-        mx: '-2rem',
-        mt: '-2rem',
-        px: '1.5rem',
-        pt: '1.5rem',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
       }}
     >
       {Editor}

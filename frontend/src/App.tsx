@@ -1,4 +1,5 @@
 import MazeCreatorPage from "./maze-creator/container/MazeCreatorPage";
+import MazePlayContainer from "./maze-creator/container/page/play/Container";
 import HomePageContainer from "./home/container/page/Container";
 import { BlogTopContainer } from "./blog/container/page/blogs/Container";
 import BlogContainer from "./blog/container/page/blog_id/Container";
@@ -21,6 +22,7 @@ function App() {
           <Route path=":blogId" element={<BlogContainer />} />
         </Route>
         <Route path="/maze" element={<MazeCreatorPage />} />
+        <Route path="/maze/play" element={<MazePlayContainer />} />
         <Route path="/trajectry" element={<TrajectryPageContainer />} />
 
         <Route element={<RequireAuth />}>
