@@ -3587,6 +3587,7 @@ dependencies = [
  "geozero",
  "quick-xml",
  "serde",
+ "serde_json",
  "shared",
  "sqlx",
  "thiserror 2.0.18",

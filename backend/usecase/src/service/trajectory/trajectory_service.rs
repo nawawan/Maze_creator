@@ -34,9 +34,11 @@ impl TrajectoryService for Service {
         let elevation = helper::calculate_elevation_sum(&trajectory.elevations);
 
         let mut trajectories = Vec::<LodTrajectory>::new();
-        for i in 1..5 {
+        for i in 1..4 {
             trajectories.push(helper::thin_out_raw_trajectory_by_lod(&trajectory, i));
         }
+
+        let thin_trajectory = trajectories[0].coordinates.clone();
 
         let activity = Activity {
             id: 0,
@@ -46,11 +48,12 @@ impl TrajectoryService for Service {
             duration: duration,
             elevation_gain: elevation,
             start_time: trajectory.started_at,
+            thin_trajectory: None,
         };
 
         let mut tx = self.repository.create_transaction().await?;
 
-        let activity = self.repository.create_activity(&mut tx, activity).await?;
+        let mut activity = self.repository.create_activity(&mut tx, activity).await?;
 
         for mut lod_trajectory in trajectories {
             lod_trajectory.activity_id = activity.id;
@@ -62,6 +65,8 @@ impl TrajectoryService for Service {
             error!("Failed to commit transaction for creating activity: {e}");
             AppError::internal(Some("Transaction commit failed"))
         })?;
+        activity.thin_trajectory = Some(thin_trajectory);
+
         Ok(activity)
     }
     async fn get_activity(&self, activity_id: String) -> Result<Activity, AppError> {

@@ -1,5 +1,6 @@
 use axum::body::Bytes;
-use axum::extract::State;
+use axum::extract::{State, Path};
+use axum::Json;
 use std::sync::Arc;
 use tracing::error;
 
@@ -7,6 +8,7 @@ use super::helper;
 use crate::error::UsecaseError;
 use crate::extractor::AuthorizedUser;
 use crate::handler::Handler;
+use crate::model::activity::ActivityResponse;
 use crate::model::trajectory::{Gpx, Trajectory};
 use usecase::service::service::Service;
 use usecase::service::trajectory::trajectory_service::TrajectoryService;
@@ -15,7 +17,7 @@ impl Handler {
         user: AuthorizedUser,
         state: State<Arc<Service>>,
         body: Bytes,
-    ) -> Result<String, UsecaseError> {
+    ) -> Result<Json<ActivityResponse>, UsecaseError> {
         if let Err(e) = helper::validate_admin(&user) {
             error!("Permission denied: {}", e.error.message);
             return Err(e);
@@ -26,10 +28,14 @@ impl Handler {
         let trajectory = Trajectory::from(gpx);
 
         let service = state.0.clone();
-        service
+        let activity = service
             .create_activity_by_trajectory(trajectory.trajectory, user.user.id)
             .await
-            .map_err(|e| UsecaseError::internal(&format!("Failed to create activity: {}", e)))?;
-        Ok("GPX upload successful".to_string())
+            .map_err(|e| {
+                error!(e.message);
+                UsecaseError::internal(&format!("Failed to create activity: {}", e))
+        })?;
+
+        Ok(Json(activity.into()))
     }
 }

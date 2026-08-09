@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-use usecase::model::trajectory::RawTrajectory;
+use usecase::model::trajectory::{Coordinate, RawTrajectory};
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -54,6 +54,13 @@ pub struct TrackPointExtension {
     pub heart_rate: Option<i64>,
     #[serde(rename = "atemp")]
     pub ambient_temperature: Option<f64>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct LineString {
+    #[serde(rename = "type")]
+    geometry_type: String,
+    coordinates: Vec<[f64; 2]>,
 }
 
 pub struct Trajectory {
@@ -113,6 +120,19 @@ impl From<Gpx> for Trajectory {
                 recorded_ats,
                 started_at: gpx.metadata.time.naive_local(),
             },
+        }
+    }
+}
+
+
+impl From<Vec<Coordinate>> for LineString {
+    fn from(coords: Vec<Coordinate>) -> Self {
+        Self {
+            geometry_type: "LineString".to_string(),
+            coordinates: coords
+                .into_iter()
+                .map(|c| [c.longitude, c.latitude])
+                .collect(),
         }
     }
 }

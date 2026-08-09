@@ -17,7 +17,7 @@ pub trait TrajectoryRepository: Send + Sync {
     ) -> Result<LodTrajectory, RepoError>;
     async fn get_trajectory(
         &self,
-        activity_id: String,
+        activity_id: i64,
         zoom_level: i32,
     ) -> Result<LodTrajectory, RepoError>;
 
