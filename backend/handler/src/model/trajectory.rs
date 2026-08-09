@@ -124,7 +124,6 @@ impl From<Gpx> for Trajectory {
     }
 }
 
-
 impl From<Vec<Coordinate>> for LineString {
     fn from(coords: Vec<Coordinate>) -> Self {
         Self {

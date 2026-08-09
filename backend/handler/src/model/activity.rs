@@ -1,6 +1,6 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
-use usecase::model::activity::{Activity};
+use usecase::model::activity::Activity;
 
 use crate::model::trajectory::LineString;
 
@@ -24,10 +24,9 @@ impl From<Activity> for ActivityResponse {
             duration: activity.duration,
             elevation_gain: activity.elevation_gain,
             start_time: activity.start_time,
-            trajectory: activity.thin_trajectory
-                .map_or(None, |coord| {
-                    Some(coord.into())
-                }),
+            trajectory: activity
+                .thin_trajectory
+                .map_or(None, |coord| Some(coord.into())),
         }
     }
 }

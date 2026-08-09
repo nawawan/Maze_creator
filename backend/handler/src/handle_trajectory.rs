@@ -1,6 +1,6 @@
-use axum::body::Bytes;
-use axum::extract::{State, Path};
 use axum::Json;
+use axum::body::Bytes;
+use axum::extract::{Path, State};
 use std::sync::Arc;
 use tracing::error;
 
@@ -34,7 +34,7 @@ impl Handler {
             .map_err(|e| {
                 error!(e.message);
                 UsecaseError::internal(&format!("Failed to create activity: {}", e))
-        })?;
+            })?;
 
         Ok(Json(activity.into()))
     }
