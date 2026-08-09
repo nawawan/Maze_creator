@@ -13,3 +13,5 @@ serde_json.workspace = true
 serde.workspace = true
 tracing.workspace = true
 jsonwebtoken.workspace = true
+quick-xml.workspace = true
+chrono.workspace = true

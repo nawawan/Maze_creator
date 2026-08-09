@@ -18,3 +18,5 @@ uuid.workspace = true
 mockall.workspace = true
 tokio.workspace = true
 bytes.workspace = true
+geozero.workspace = true
+geo-types.workspace = true

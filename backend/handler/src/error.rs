@@ -33,6 +33,11 @@ impl UsecaseError {
             error: AppError::permission_denied(Some(message)),
         }
     }
+    pub fn internal(message: &str) -> Self {
+        UsecaseError {
+            error: AppError::internal(Some(message)),
+        }
+    }
 }
 
 impl IntoResponse for UsecaseError {

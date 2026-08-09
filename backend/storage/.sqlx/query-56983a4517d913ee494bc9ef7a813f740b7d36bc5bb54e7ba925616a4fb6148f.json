@@ -1,0 +1,25 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO trajectory_lod (activity_id, trajectory, recorded_ats, elevations, heart_rates, zoom_from, zoom_to)\n            VALUES($1, ST_SetSRID($2::geometry, 4326), $3, $4, $5, $6, $7);\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        {
+          "Custom": {
+            "name": "geometry",
+            "kind": "Simple"
+          }
+        },
+        "TimestampArray",
+        "Float8Array",
+        "Int8Array",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "56983a4517d913ee494bc9ef7a813f740b7d36bc5bb54e7ba925616a4fb6148f"
+}

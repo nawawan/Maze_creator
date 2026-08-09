@@ -44,7 +44,8 @@ async fn main() {
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
         .nest("/health", create_health_router(pool))
-        .nest("/api", create_blog_router(service))
+        .nest("/api", create_blog_router(service.clone()))
+        .nest("/api", create_trajectory_router(service.clone()))
         .fallback(fallback);
     let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
@@ -76,6 +77,15 @@ fn create_blog_router(service: Arc<Service>) -> Router {
         .with_state(service);
 
     Router::new().nest("/blogs", blog_routers)
+}
+
+fn create_trajectory_router(service: Arc<Service>) -> Router {
+    let trajectory_routers = Router::new()
+        .route("/upload", post(Handler::upload_gpx))
+        .fallback(api_fallback)
+        .with_state(service);
+
+    Router::new().nest("/trajectory", trajectory_routers)
 }
 
 fn create_health_router(pool: PgPool) -> Router {

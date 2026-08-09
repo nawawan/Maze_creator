@@ -42,7 +42,7 @@ impl BlogRepository for Repository {
             .await
             .unwrap_or_else(|e| {
                 error!("Failed to get blogs: {}", e);
-                vec![]
+                Vec::new()
             })
     }
 
