@@ -13,6 +13,9 @@
       "bucket_name": "blog-assets"
     }
   ],
+  "vars": {
+    "ENVIRONMENT": "development"
+  },
   "env": {
     "preview": {
       "workers_dev": false,
@@ -23,6 +26,7 @@
         }
       ],
       "vars": {
+        "ENVIRONMENT": "preview",
         "TEAM_DOMAIN": "nawawan.cloudflareaccess.com",
         "PUBLIC_URL": "https://nawawan.com",
         "AUD": "756ccca02f1b6db0c85afe0ff0edf345ee5a8bed3b56d65f6b6178e9d2bc3b5a",
@@ -44,6 +48,7 @@
         }
       ],
       "vars": {
+        "ENVIRONMENT": "production",
         "TEAM_DOMAIN": "nawawan.cloudflareaccess.com",
         "PUBLIC_URL": "https://image.nawawan.com",
         "AUD": "756ccca02f1b6db0c85afe0ff0edf345ee5a8bed3b56d65f6b6178e9d2bc3b5a",

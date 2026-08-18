@@ -18,9 +18,12 @@ type Bindings = {
   API_URL: string;
   BLOG_BUCKET: R2Bucket;
   DSN: string;
+  ENVIRONMENT: string;
 };
 
 const SITE_NAME = "nawa's blog";
+
+const isProduction = (env: Bindings) => env.ENVIRONMENT === 'production';
 
 const renderBlogPage = (opts: {
   bodyHtml: string;
@@ -29,6 +32,7 @@ const renderBlogPage = (opts: {
   canonicalUrl: string;
   ogType: 'website' | 'article';
   initialDataScript: string;
+  indexable: boolean;
 }) => `
       <html lang="ja">
         <head>
@@ -37,6 +41,7 @@ const renderBlogPage = (opts: {
           <title>${escapeHtml(opts.title)}</title>
           <meta name="description" content="${escapeHtml(opts.description)}" />
           <link rel="canonical" href="${escapeHtml(opts.canonicalUrl)}" />
+          ${opts.indexable ? '' : '<meta name="robots" content="noindex, nofollow" />'}
           <meta property="og:site_name" content="${escapeHtml(SITE_NAME)}" />
           <meta property="og:type" content="${opts.ogType}" />
           <meta property="og:title" content="${escapeHtml(opts.title)}" />
@@ -56,16 +61,32 @@ const renderBlogPage = (opts: {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
+app.use('*', async (c, next) => {
+  await next();
+  if (!isProduction(c.env)) {
+    const res = new Response(c.res.body, c.res);
+    res.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    c.res = res;
+  }
+});
+
 app.get('/assets/*', (c) => {
   return c.env.ASSETS.fetch(c.req.raw);
 });
 
 app.get('/robots.txt', (c) => {
+  if (!isProduction(c.env)) {
+    return c.text('User-agent: *\nDisallow: /\n');
+  }
   const origin = new URL(c.req.url).origin;
   return c.text(`User-agent: *\nAllow: /\nSitemap: ${origin}/sitemap.xml\n`);
 });
 
 app.get('/sitemap.xml', async (c) => {
+  if (!isProduction(c.env)) {
+    c.header('Content-Type', 'application/xml');
+    return c.body('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>\n');
+  }
   const origin = new URL(c.req.url).origin;
   const publishedBlogs: BlogResponse[] = await BlogService.getBlogs(c.env.API_URL, 'PUBLISHED').catch(() => []);
 
@@ -102,6 +123,7 @@ app.get('/blogs', async (c) => {
     canonicalUrl: `${origin}/blogs`,
     ogType: 'website',
     initialDataScript: `<script>window.__BLOG_LIST_INITIAL_DATA__ = ${serializeInitialData(publishedBlogs)};</script>`,
+    indexable: isProduction(c.env),
   }));
 })
 
@@ -124,6 +146,7 @@ app.get('/blogs/:id', async (c) => {
       canonicalUrl: `${origin}/blogs/${id}`,
       ogType: 'article',
       initialDataScript: '',
+      indexable: false,
     }), 404);
   }
 
@@ -139,6 +162,7 @@ app.get('/blogs/:id', async (c) => {
     canonicalUrl: `${origin}/blogs/${id}`,
     ogType: 'article',
     initialDataScript: `<script>window.__BLOG_INITIAL_DATA__ = ${serializeInitialData(blog)};</script>`,
+    indexable: isProduction(c.env),
   }));
 })
 
