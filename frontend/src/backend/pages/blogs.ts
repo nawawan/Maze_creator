@@ -33,8 +33,11 @@ blogs.get('/:id',
     const { id } = c.req.valid('param');
 
     const blogWithContent: BlogDetails | null = await BlogService.getBlogWithContent(apiUrl, c.env.BLOG_BUCKET, id).catch(() => null);
-    if (!blogWithContent || blogWithContent.status !== 'PUBLISHED') {
-        return c.json({ error: 'Not Found' }, 404);
+    if (!blogWithContent) {
+        return c.json({ error: 'Not Found', reason: 'missing' }, 404);
+    }
+    if (blogWithContent.status !== 'PUBLISHED') {
+        return c.json({ error: 'Not Found', reason: 'unpublished' }, 404);
     }
     return c.json(blogWithContent);
 });

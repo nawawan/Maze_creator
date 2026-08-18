@@ -19,3 +19,5 @@ export type BlogDetails = {
     status: string;
     tag?: string;
 }
+
+export type BlogNotFoundReason = "missing" | "unpublished";

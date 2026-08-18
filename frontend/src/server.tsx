@@ -9,7 +9,7 @@ import blogs from './backend/pages/blogs';
 import admin from './backend/pages/admin';
 import { BlogService } from './backend/service/BlogService';
 import { escapeHtml, serializeInitialData, toExcerpt } from './backend/util/html';
-import type { BlogDetails, BlogResponse } from './shared/types/blog';
+import type { BlogDetails, BlogNotFoundReason, BlogResponse } from './shared/types/blog';
 
 type Bindings = {
   ASSETS: {
@@ -109,18 +109,18 @@ app.get('/blogs/:id', async (c) => {
   const origin = new URL(c.req.url).origin;
   const id = c.req.param('id');
   const blog: BlogDetails | null = await BlogService.getBlogWithContent(c.env.API_URL, c.env.BLOG_BUCKET, id).catch(() => null);
-  const isPublished = blog !== null && blog.status === 'PUBLISHED';
 
-  if (!isPublished) {
+  if (!blog || blog.status !== 'PUBLISHED') {
+    const reason: BlogNotFoundReason = !blog ? 'missing' : 'unpublished';
     const htmlContent = renderToString(
       <StaticRouter location={c.req.path}>
-        <BlogContainer />
+        <BlogContainer notFoundReason={reason} />
       </StaticRouter>);
 
     return c.html(renderBlogPage({
       bodyHtml: htmlContent,
-      title: `この記事は公開されていません | ${SITE_NAME}`,
-      description: "この記事は公開されていません。",
+      title: reason === 'missing' ? `記事が見つかりません | ${SITE_NAME}` : `この記事は公開されていません | ${SITE_NAME}`,
+      description: reason === 'missing' ? "指定された記事は見つかりませんでした。" : "この記事は公開されていません。",
       canonicalUrl: `${origin}/blogs/${id}`,
       ogType: 'article',
       initialDataScript: '',
