@@ -7,13 +7,25 @@ import SidebarContainer from "../blogs/widgets/Sidebar/Container";
 import MarkdownHtml from "../../../presentation/MarkdownHtml/MarkdownHtml";
 import { type BlogDetails } from "../../../../shared/types/blog";
 
-const useGenerateProps = (): BlogProps & { isLoading: boolean } => {
-    const [blog, setBlog] = useState<BlogDetails>();
-    const [isLoading, setIsLoading] = useState(true);
+const useGenerateProps = (initialBlog?: BlogDetails): BlogProps & { isLoading: boolean } => {
     const { blogId } = useParams<{ blogId: string }>();
+    const [blog, setBlog] = useState<BlogDetails | undefined>(() => {
+        if (initialBlog) return initialBlog;
+        if (typeof window !== "undefined" && window.__BLOG_INITIAL_DATA__?.id === blogId) {
+            const seeded = window.__BLOG_INITIAL_DATA__;
+            window.__BLOG_INITIAL_DATA__ = undefined;
+            return seeded;
+        }
+        return undefined;
+    });
+    const [isLoading, setIsLoading] = useState(!blog);
 
     useEffect(() => {
         if (!blogId) {
+            setIsLoading(false);
+            return;
+        }
+        if (blog?.id === blogId) {
             setIsLoading(false);
             return;
         }
@@ -33,6 +45,7 @@ const useGenerateProps = (): BlogProps & { isLoading: boolean } => {
             }
         };
         fetchBlog();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [blogId]);
 
     if (!blog || !blog.content_html) {

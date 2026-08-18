@@ -1,4 +1,5 @@
 import { LinearProgress, Paper, Stack, Tab, Tabs, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
 import { BLOG_TAGS } from "../../../shared/types/blog";
 
 export type EntryCardProps = {
@@ -16,7 +17,7 @@ export type EntryCardProps = {
 };
 
 export const EntryCard = (props: EntryCardProps) => {
-    const { posts, onClick, selectedTag, onTagFilterChange, isFetching } = props;
+    const { posts, selectedTag, onTagFilterChange, isFetching } = props;
 
     return (
         <Stack spacing={2}>
@@ -37,13 +38,17 @@ export const EntryCard = (props: EntryCardProps) => {
                 {posts.map((post) => (
                 <Paper
                     key={post.id}
+                    component={Link}
+                    to={`/blogs/${post.id}`}
                     elevation={0}
                     sx={{
+                      display: "block",
                       bgcolor: "grey.300",
                       px: 2,
                       py: 2,
+                      color: "inherit",
+                      textDecoration: "none",
                     }}
-                    onClick={() => onClick(post.id)}
                     >
                     <Typography variant="subtitle1" fontWeight={600}>
                         {post.title}

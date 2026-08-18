@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { MemoryRouter } from 'react-router-dom';
 
 import EntryCard  from './EntryCard';
 
 const meta = {
     title : "EntryCard",
     component: EntryCard,
+    decorators: [(Story) => <MemoryRouter><Story /></MemoryRouter>],
 } satisfies Meta<typeof EntryCard>;
 
 export default meta;

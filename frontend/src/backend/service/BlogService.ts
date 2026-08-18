@@ -1,4 +1,4 @@
-import { type BlogResponse } from "../../shared/types/blog";
+import { type BlogDetails, type BlogResponse } from "../../shared/types/blog";
 
 export const BlogService = {
     async getBlogs(apiUrl: string, status?: string, tag?: string) : Promise<BlogResponse[]> {
@@ -44,6 +44,26 @@ export const BlogService = {
             throw new Error('Failed to get blog content');
         }
         return await object.text();
+    },
+
+    async getBlogWithContent(apiUrl: string, bucket: R2Bucket, id: string): Promise<BlogDetails> {
+        const blog = await BlogService.getBlogById(apiUrl, id)
+            .catch((e) => {
+                throw new Error("Failed to fetch blog by id: " + (e instanceof Error ? e.message : String(e)));
+            });
+        const content = await BlogService.getBlogContent(bucket, blog.content_key)
+            .catch((e) => {
+                throw new Error("Failed to fetch blog content: " + (e instanceof Error ? e.message : String(e)));
+            });
+
+        return {
+            id: blog.id,
+            title: blog.title,
+            slug: blog.slug === "" ? undefined : blog.slug,
+            content_html: content,
+            status: blog.status,
+            tag: blog.tag,
+        };
     },
 
     async createBlogId(apiUrl: string, jwt: string) : Promise<string> {

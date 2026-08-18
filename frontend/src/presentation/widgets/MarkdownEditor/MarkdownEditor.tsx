@@ -163,6 +163,20 @@ const MarkdownEditor = (props: MarkdownEditorProps) => {
         }
     };
 
+    const handleUnpublish = async () => {
+        if (!validateFields()) return;
+        setIsSaving(true);
+        try {
+            await props.onSave(markdown, props.id, title, slug, 'DRAFT', tag);
+            setPublished(false);
+            Snackbar.Notify({ message: '公開を取り下げました', severity: 'success' });
+        } catch {
+            Snackbar.Notify({ message: '公開の取り下げに失敗しました', severity: 'error' });
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     return (
         <Stack spacing={2} sx={{ height: '100%', overflow: 'hidden', position: 'relative', pb: '80px' }}>
             <Stack direction="row" sx={{ justifyContent: 'center'}}>
@@ -232,10 +246,14 @@ const MarkdownEditor = (props: MarkdownEditorProps) => {
                 <Button variant="outlined" onClick={handleSave} disabled={isSaving} startIcon={isSaving ? <CircularProgress size={16} /> : undefined}>
                     SAVE
                 </Button>
-                {!published && (
+                {!published ? (
                     <StyledButton onClick={handlePublish} disabled={isSaving} startIcon={isSaving ? <CircularProgress size={16} sx={{ color: '#fff' }} /> : undefined}>
                         公開する
                     </StyledButton>
+                ) : (
+                    <Button variant="outlined" color="warning" onClick={handleUnpublish} disabled={isSaving} startIcon={isSaving ? <CircularProgress size={16} /> : undefined}>
+                        公開を取り下げる
+                    </Button>
                 )}
             </Box>
             <Snackbar />

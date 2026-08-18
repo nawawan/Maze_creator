@@ -18,18 +18,31 @@ const toPosts = (data: BlogResponse[]): Posts =>
         tag: blog.tag,
     }));
 
-export const useGenerateProps = (): EntryCardProps & { isLoading: boolean } => {
+export const useGenerateProps = (initialBlogs?: BlogResponse[]): EntryCardProps & { isLoading: boolean } => {
     const navigate = useNavigate();
-    const [posts, setPosts] = useState<Posts>([]);
+    const seededBlogs = initialBlogs ?? (typeof window !== "undefined" ? window.__BLOG_LIST_INITIAL_DATA__ : undefined);
+    const [posts, setPosts] = useState<Posts>(() => (seededBlogs ? toPosts(seededBlogs) : []));
     const [selectedTag, setSelectedTag] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(!seededBlogs);
     const [isFetching, setIsFetching] = useState(false);
 
     // Keep the previously rendered posts on screen while a new tag is being
     // fetched, guarding against a superseded request resolving out of order.
     const requestIdRef = useRef(0);
+    const hasSeededRef = useRef(!!seededBlogs);
 
     useEffect(() => {
+        if (typeof window !== "undefined") {
+            window.__BLOG_LIST_INITIAL_DATA__ = undefined;
+        }
+        // The very first render already has SSR-provided posts for the
+        // untagged list, so skip the redundant initial fetch.
+        if (hasSeededRef.current && selectedTag === "") {
+            hasSeededRef.current = false;
+            setIsLoading(false);
+            return;
+        }
+
         const requestId = ++requestIdRef.current;
         setIsFetching(true);
 

@@ -16,3 +16,12 @@ export const Default: Story = {
         onSave: async (markdown: string, id: string) => { alert(markdown + id); },
     },
 };
+
+export const Published: Story = {
+    args: {
+        id: "test",
+        tag: "TECH",
+        isPublished: true,
+        onSave: async (markdown: string, id: string) => { alert(markdown + id); },
+    },
+};
