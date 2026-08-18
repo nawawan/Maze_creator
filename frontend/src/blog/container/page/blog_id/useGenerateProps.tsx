@@ -9,22 +9,24 @@ import { type BlogDetails, type BlogNotFoundReason } from "../../../../shared/ty
 
 const useGenerateProps = (initialBlog?: BlogDetails, initialNotFoundReason?: BlogNotFoundReason): BlogProps & { isLoading: boolean } => {
     const { blogId } = useParams<{ blogId: string }>();
-    const [blog, setBlog] = useState<BlogDetails | undefined>(() => {
-        if (initialBlog) return initialBlog;
-        if (typeof window !== "undefined" && window.__BLOG_INITIAL_DATA__?.id === blogId) {
-            const seeded = window.__BLOG_INITIAL_DATA__;
-            window.__BLOG_INITIAL_DATA__ = undefined;
-            return seeded;
-        }
-        return undefined;
-    });
+    // Reading window here is a pure read (no mutation), so it's safe to do
+    // during render. The global is only cleared inside the effect below,
+    // after React has committed the value into state.
+    const seededBlog = initialBlog ?? (typeof window !== "undefined" && window.__BLOG_INITIAL_DATA__?.id === blogId
+        ? window.__BLOG_INITIAL_DATA__
+        : undefined);
+
+    const [blog, setBlog] = useState<BlogDetails | undefined>(seededBlog);
     const [notFoundReason, setNotFoundReason] = useState<BlogNotFoundReason | undefined>(initialNotFoundReason);
     // Server already told us whether this id exists/is published; skip the
     // redundant initial fetch. Later blogId changes (client-side nav) fetch normally.
-    const hasServerAnswerRef = useRef(!!(blog || initialNotFoundReason));
+    const hasServerAnswerRef = useRef(!!(seededBlog || initialNotFoundReason));
     const [isLoading, setIsLoading] = useState(!hasServerAnswerRef.current);
 
     useEffect(() => {
+        if (typeof window !== "undefined") {
+            window.__BLOG_INITIAL_DATA__ = undefined;
+        }
         if (!blogId) {
             setIsLoading(false);
             return;
