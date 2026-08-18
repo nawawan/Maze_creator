@@ -50,8 +50,8 @@ const useGenerateProps = (initialBlog?: BlogDetails): BlogProps & { isLoading: b
 
     if (!blog || !blog.content_html) {
         return {
-            title: "No Content",
-            content: "No content available for this blog post.",
+            title: "この記事は公開されていません",
+            content: "この記事は公開されていません。",
             sidebar: <SidebarContainer />,
             isLoading,
         };

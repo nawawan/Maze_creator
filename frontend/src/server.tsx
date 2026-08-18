@@ -109,22 +109,28 @@ app.get('/blogs/:id', async (c) => {
   const origin = new URL(c.req.url).origin;
   const id = c.req.param('id');
   const blog: BlogDetails | null = await BlogService.getBlogWithContent(c.env.API_URL, c.env.BLOG_BUCKET, id).catch(() => null);
+  const isPublished = blog !== null && blog.status === 'PUBLISHED';
 
-  const htmlContent = renderToString(
-    <StaticRouter location={c.req.path}>
-      <BlogContainer initialBlog={blog ?? undefined} />
-    </StaticRouter>);
+  if (!isPublished) {
+    const htmlContent = renderToString(
+      <StaticRouter location={c.req.path}>
+        <BlogContainer />
+      </StaticRouter>);
 
-  if (!blog) {
     return c.html(renderBlogPage({
       bodyHtml: htmlContent,
-      title: `記事が見つかりません | ${SITE_NAME}`,
-      description: "指定された記事は見つかりませんでした。",
+      title: `この記事は公開されていません | ${SITE_NAME}`,
+      description: "この記事は公開されていません。",
       canonicalUrl: `${origin}/blogs/${id}`,
       ogType: 'article',
       initialDataScript: '',
-    }));
+    }), 404);
   }
+
+  const htmlContent = renderToString(
+    <StaticRouter location={c.req.path}>
+      <BlogContainer initialBlog={blog} />
+    </StaticRouter>);
 
   return c.html(renderBlogPage({
     bodyHtml: htmlContent,
