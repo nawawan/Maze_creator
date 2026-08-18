@@ -138,6 +138,5 @@ jobs:
           push: true
           tags: |
             asia-northeast1-docker.pkg.dev/nawawan/nawawan-prod-repository/nawawan-playground:${{ needs.release.outputs.version }}
-            asia-northeast1-docker.pkg.dev/nawawan/nawawan-prod-repository/nawawan-playground:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
