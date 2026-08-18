@@ -31,7 +31,7 @@ const useGenerateProps = (article_id: string): MarkdownEditorProps & { loaded: b
 
         const fetchStatus = async () => {
             try {
-                const res = await fetch(`/api/blogs/${article_id}`);
+                const res = await fetch(`/api/admin/blogs/${article_id}`);
                 if (!res.ok) return;
                 const blog: BlogDetails = await res.json();
                 setIsPublished(blog.status === 'PUBLISHED');
