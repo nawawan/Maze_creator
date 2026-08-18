@@ -9,6 +9,10 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    # backend releases publish their own GitHub release (tagged "backend-v*"),
+    # which also fires this workflow's `release` trigger. Skip those so tag
+    # releases only deploy the frontend.
+    if: github.event_name != 'release' || !startsWith(github.event.release.tag_name, 'backend-')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7

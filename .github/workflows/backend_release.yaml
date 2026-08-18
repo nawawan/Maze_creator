@@ -1,34 +1,21 @@
 name: Backend Release CICD
-run-name: deploy backend app to cloud run
+run-name: release backend (${{ inputs.bump }}) and deploy to cloud run
 on:
   workflow_dispatch:
-  release:
-    types: [created]
-    branches:
-      - main
+    inputs:
+      bump:
+        description: Version bump type
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+        default: patch
 
 jobs:
-  check-skip:
-    runs-on: ubuntu-latest
-    outputs:
-      skip: ${{ steps.check.outputs.skip }}
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 1
-      - id: check
-        run: |
-          MSG=$(git log -1 --format='%s')
-          if echo "$MSG" | grep -qi 'skip ci'; then
-            echo "skip=true" >> $GITHUB_OUTPUT
-          else
-            echo "skip=false" >> $GITHUB_OUTPUT
-          fi
   lint:
     runs-on: ubuntu-latest
-    needs: [check-skip]
-    if: needs.check-skip.outputs.skip != 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -46,8 +33,6 @@ jobs:
         working-directory: backend
   test:
     runs-on: ubuntu-latest
-    needs: [check-skip]
-    if: needs.check-skip.outputs.skip != 'true'
     services:
       postgres:
         image: postgres:16-alpine
@@ -86,10 +71,48 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - name: Run tests
         run: cd backend && SQLX_OFFLINE=true cargo test --workspace
+  release:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+      tag: ${{ steps.bump.outputs.tag }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Compute next version
+        id: bump
+        run: |
+          git fetch --tags --force
+          latest=$(git tag -l 'backend-v*' | sed 's/^backend-v//' | sort -V | tail -1)
+          latest=${latest:-0.0.0}
+          IFS='.' read -r major minor patch <<< "$latest"
+          case "${{ inputs.bump }}" in
+            major) major=$((major + 1)); minor=0; patch=0 ;;
+            minor) minor=$((minor + 1)); patch=0 ;;
+            patch) patch=$((patch + 1)) ;;
+          esac
+          version="${major}.${minor}.${patch}"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "tag=backend-v${version}" >> "$GITHUB_OUTPUT"
+      - name: Create and push tag
+        run: |
+          git tag "${{ steps.bump.outputs.tag }}"
+          git push origin "${{ steps.bump.outputs.tag }}"
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.bump.outputs.tag }}" \
+            --title "${{ steps.bump.outputs.tag }}" \
+            --generate-notes
   build:
     runs-on: ubuntu-latest
-    needs: [check-skip, lint, test]
-    if: needs.check-skip.outputs.skip != 'true'
+    needs: [release]
     environment:
       name: google_cloud_prod
     permissions:
@@ -114,7 +137,7 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: |
-            asia-northeast1-docker.pkg.dev/nawawan/nawawan-prod-repository/nawawan-playground:${{ github.sha }}
-            asia-northeast1-docker.pkg.dev/nawawan/nawawan-prod-repository/nawawan-playground:${{ github.event.release.tag_name || 'latest' }}
+            asia-northeast1-docker.pkg.dev/nawawan/nawawan-prod-repository/nawawan-playground:${{ needs.release.outputs.version }}
+            asia-northeast1-docker.pkg.dev/nawawan/nawawan-prod-repository/nawawan-playground:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
