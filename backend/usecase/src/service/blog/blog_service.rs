@@ -13,7 +13,13 @@ use uuid::Uuid;
 #[async_trait]
 pub trait BlogService {
     async fn get_blog(&self, id: String) -> Result<Blog, AppError>;
-    async fn list_blogs(&self, year: Option<&String>, month: Option<&String>) -> Vec<Blog>;
+    async fn list_blogs(
+        &self,
+        year: Option<&String>,
+        month: Option<&String>,
+        status: Option<BlogStatus>,
+        tag: Option<&String>,
+    ) -> Vec<Blog>;
     async fn create_blog(&self, blog: BlogRequest) -> Result<Blog, AppError>;
     async fn update_blog(&self, blog: BlogRequest) -> Result<Blog, AppError>;
     async fn create_draft(&self) -> Result<String, AppError>;
@@ -22,8 +28,14 @@ pub trait BlogService {
 
 #[async_trait]
 impl BlogService for Service {
-    async fn list_blogs(&self, year: Option<&String>, month: Option<&String>) -> Vec<Blog> {
-        let filter = BlogFilter::new(year, month);
+    async fn list_blogs(
+        &self,
+        year: Option<&String>,
+        month: Option<&String>,
+        status: Option<BlogStatus>,
+        tag: Option<&String>,
+    ) -> Vec<Blog> {
+        let filter = BlogFilter::new(year, month, status, tag);
         let blogs = self.repository.list_blogs(filter).await;
 
         blogs
@@ -51,6 +63,8 @@ impl BlogService for Service {
             slug: initial_slug,
             content_key: format!("uploads/blogs/{}.html", id),
             status: BlogStatus::Draft,
+            published_at: None,
+            tag: None,
         };
         let mut tx = self.repository.create_transaction().await?;
         let id_str = self.repository.create_draft(&mut tx, blog).await?;
@@ -63,7 +77,7 @@ impl BlogService for Service {
 
     async fn create_blog(&self, blog_req: BlogRequest) -> Result<Blog, AppError> {
         let uuid = Uuid::now_v7();
-        let content_key = format!("upload/blogs/{}.html", blog_req.id);
+        let content_key = format!("uploads/blogs/{}.html", blog_req.id);
 
         let blog = Blog {
             id: uuid,
@@ -71,6 +85,8 @@ impl BlogService for Service {
             slug: "".to_string(),
             content_key: content_key,
             status: BlogStatus::Draft,
+            published_at: None,
+            tag: None,
         };
 
         let result = {
@@ -98,7 +114,7 @@ impl BlogService for Service {
         })?;
 
         let mut blog = self.repository.get_blog(blog_id).await?;
-        let content_key = format!("upload/blogs/{}.html", blog_req.id);
+        let content_key = format!("uploads/blogs/{}.html", blog_req.id);
         if blog.content_key != content_key {
             blog.content_key = content_key;
         }
@@ -109,6 +125,18 @@ impl BlogService for Service {
 
         if let Some(slug) = blog_req.slug {
             blog.slug = slug;
+        }
+
+        if let Some(status) = blog_req.status {
+            blog.status = status;
+        }
+
+        if matches!(blog.status, BlogStatus::Published) && blog.published_at.is_none() {
+            blog.published_at = Some(chrono::Utc::now().naive_utc());
+        }
+
+        if let Some(tag) = blog_req.tag {
+            blog.tag = Some(tag);
         }
 
         let content_html = convert(&blog_req.content).map_err(|e| {

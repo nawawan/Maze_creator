@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO blogs (id, status, title, content_key, slug, tag) VALUES ($1, 'DRAFT', $2, $3, $4, $5)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1e59c34cd1e6ab26dfbffc87ba5290a777e1495eb4a97f0c72999a71d6258657"
+}

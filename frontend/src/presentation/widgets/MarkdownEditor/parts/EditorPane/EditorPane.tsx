@@ -7,12 +7,25 @@ export type EditorPaneProps = {
     textareaRef: React.RefObject<HTMLTextAreaElement | null>;
     markdown: string;
     lineCount: number;
+    lineWraps?: number[];
     onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onScroll: () => void;
     onInsert: (newMarkdown: string, cursorPos: number) => void;
+    onLineWrapsChange?: (lineWraps: number[]) => void;
 };
 
-const EditorPane = ({ lineNumRef, preRef, textareaRef, markdown, lineCount, onChange, onScroll, onInsert }: EditorPaneProps) => {
+const EditorPane = ({
+    lineNumRef,
+    preRef,
+    textareaRef,
+    markdown,
+    lineCount,
+    lineWraps,
+    onChange,
+    onScroll,
+    onInsert,
+    onLineWrapsChange,
+}: EditorPaneProps) => {
     return (
         <div
             style={{
@@ -25,7 +38,7 @@ const EditorPane = ({ lineNumRef, preRef, textareaRef, markdown, lineCount, onCh
                 border: '1px solid #30363d',
             }}
         >
-            <LineNumbers scrollRef={lineNumRef} lineCount={lineCount} />
+            <LineNumbers scrollRef={lineNumRef} lineCount={lineCount} lineWraps={lineWraps} />
             <EditorOverlay
                 preRef={preRef}
                 textareaRef={textareaRef}
@@ -33,6 +46,7 @@ const EditorPane = ({ lineNumRef, preRef, textareaRef, markdown, lineCount, onCh
                 onChange={onChange}
                 onScroll={onScroll}
                 onInsert={onInsert}
+                onLineWrapsChange={onLineWrapsChange}
             />
         </div>
     );

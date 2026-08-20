@@ -2,9 +2,11 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typog
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
 
-type UploadModalProps = {
+export type UploadModalProps = {
   open: boolean;
+  onImport: (file: File) => void;
   onClose: () => void;
+  isLoading: boolean;
 };
 
 const StyledDialog = styled(Dialog)({
@@ -70,24 +72,26 @@ const ImportButton = styled(ActionButton)({
   fontWeight: 700,
 });
 
-export const UploadModal = ({ open, onClose }: UploadModalProps) => {
+export const UploadModal = (props: UploadModalProps) => {
   const [dragging, setDragging] = useState(false);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
 
-  if (!open) return null;
+  if (!props.open) return null;
 
   return (
     <StyledDialog
       className="trajectry-upload-modal"
-      open={open}
-      onClose={onClose}
-      PaperProps={{
-        sx: {
+      open={props.open}
+      onClose={props.onClose}
+      slotProps={{
+        paper:{
+          sx : {
           background: "var(--paper)",
           borderRadius: "20px",
           boxShadow: "0 20px 50px rgba(0, 0, 0, 0.2)",
           padding: "24px",
           width: "min(480px, calc(100vw - 32px))",
-        },
+        }}
       }}
     >
       <Heading>
@@ -108,6 +112,7 @@ export const UploadModal = ({ open, onClose }: UploadModalProps) => {
           }}
           onDrop={(event) => {
             event.preventDefault();
+            setUploadFile(event.dataTransfer.files[0]);
             setDragging(false);
           }}
           sx={{
@@ -127,10 +132,10 @@ export const UploadModal = ({ open, onClose }: UploadModalProps) => {
         </DropZone>
       </Content>
       <Actions>
-        <CancelButton disableRipple onClick={onClose} type="button">
+        <CancelButton disableRipple onClick={props.onClose} type="button">
           cancel
         </CancelButton>
-        <ImportButton disabled disableRipple type="button">
+        <ImportButton loading={props.isLoading} disabled={uploadFile ? true : false} onClick={() => props.onImport(uploadFile!!)} disableRipple type="button">
           import
         </ImportButton>
       </Actions>

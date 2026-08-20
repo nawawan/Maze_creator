@@ -1,11 +1,14 @@
-import { FONT_FAMILY, FONT_SIZE, LINE_HEIGHT, PADDING } from '../constants';
+import { FONT_FAMILY, FONT_SIZE, LINE_HEIGHT, PADDING, ROW_HEIGHT_PX } from '../constants';
 
 export type LineNumbersProps = {
     scrollRef: React.RefObject<HTMLDivElement | null>;
     lineCount: number;
+    // Number of visual rows each logical line occupies once wrapped (index-aligned
+    // with the markdown's lines). Falls back to 1 row per line when not yet measured.
+    lineWraps?: number[];
 };
 
-const LineNumbers = ({ scrollRef, lineCount }: LineNumbersProps) => (
+const LineNumbers = ({ scrollRef, lineCount, lineWraps }: LineNumbersProps) => (
     <div
         ref={scrollRef}
         style={{
@@ -25,7 +28,9 @@ const LineNumbers = ({ scrollRef, lineCount }: LineNumbersProps) => (
         }}
     >
         {Array.from({ length: lineCount }, (_, i) => (
-            <div key={i + 1}>{i + 1}</div>
+            <div key={i + 1} style={{ height: (lineWraps?.[i] ?? 1) * ROW_HEIGHT_PX }}>
+                {i + 1}
+            </div>
         ))}
     </div>
 );

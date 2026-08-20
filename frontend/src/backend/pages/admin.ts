@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 
 import blogs from './admin/blogs';
+import trajectories from './admin/trajectory';
 
 type Env = {
     API_URL: string;
@@ -14,5 +15,6 @@ type Env = {
 const admin = new Hono<{ Bindings: Env }>();
 
 admin.route('/blogs', blogs);
+admin.route('/trajectory', trajectories);
 
 export default admin;

@@ -1,20 +1,25 @@
-import { Box, Button, ButtonBase, Typography } from "@mui/material";
+import { Box, Button, ButtonBase, Tab, Tabs, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import { BLOG_TAGS } from "../../../shared/types/blog";
 
 export type Blog = {
   id: string;
   title: string;
   date: string;
+  tag?: string;
 };
 
 export type AdminHomeProps = {
   posts: Blog[];
+  selectedTag: string;
   onWriteClick?: () => void;
   onPostClick?: (id: string, title: string) => void;
+  onTagFilterChange?: (tag: string) => void;
 };
 
 function AdminHome(props: AdminHomeProps) {
-  const { posts, onWriteClick, onPostClick } = props;
+  const { posts, selectedTag, onWriteClick, onPostClick, onTagFilterChange } = props;
+
   return (
     <Box sx={{ p: 4 }}>
       <Box
@@ -36,6 +41,16 @@ function AdminHome(props: AdminHomeProps) {
           ブログを書く
         </Button>
       </Box>
+      <Tabs
+        value={selectedTag}
+        onChange={(_, value: string) => onTagFilterChange?.(value)}
+        sx={{ mb: 3, borderBottom: 1, borderColor: "divider" }}
+      >
+        <Tab label="一覧" value="" />
+        {BLOG_TAGS.map((tag) => (
+          <Tab key={tag} label={tag} value={tag} />
+        ))}
+      </Tabs>
       <Box
         sx={{
           display: "grid",

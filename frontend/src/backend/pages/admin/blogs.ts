@@ -21,10 +21,10 @@ const blogs = new Hono<{ Bindings: Env }>();
 
 blogs.post('/', async (c) => {
     const apiUrl = c.env.API_URL;
-    const { id, title, content, slug } = await c.req.json();
+    const { id, title, content, slug, status, tag } = await c.req.json();
     const jwt = c.req.header(JWT_HEADER) ?? "";
 
-    const resp: BlogResponse = await BlogService.createBlog(apiUrl, jwt, id, content, title, slug);
+    const resp: BlogResponse = await BlogService.createBlog(apiUrl, jwt, id, content, title, slug, status, tag);
     return c.json(resp);
 });
 

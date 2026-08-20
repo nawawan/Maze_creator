@@ -20,8 +20,9 @@ const blogs = new Hono<{ Bindings: Env }>();
 blogs.get('/', async (c) => {
     const apiUrl = c.env.API_URL;
     const status = c.req.query('status');
+    const tag = c.req.query('tag');
 
-    const resp: BlogResponse[] = await BlogService.getBlogs(apiUrl, status);
+    const resp: BlogResponse[] = await BlogService.getBlogs(apiUrl, status, tag);
     return c.json(resp);
 });
 
@@ -43,7 +44,10 @@ blogs.get('/:id',
     const blogWithContent: BlogDetails = {
         id: blog.id,
         title: blog.title,
+        slug: blog.slug === "" ? undefined : blog.slug,
         content_html: content,
+        status: blog.status,
+        tag: blog.tag,
     }
     return c.json(blogWithContent);
 });

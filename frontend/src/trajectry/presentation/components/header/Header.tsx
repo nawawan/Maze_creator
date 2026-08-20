@@ -59,6 +59,6 @@ export const Header = ({ onUpload }: HeaderProps) => (
     <UploadButton disableRipple type="button" onClick={onUpload}>
       + Upload GPX
     </UploadButton>
-    <Avatar>あ</Avatar>
+    {/* <Avatar>あ</Avatar> */}
   </HeaderRoot>
 );

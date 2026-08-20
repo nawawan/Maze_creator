@@ -106,8 +106,8 @@ export const TrajectryHeight = ({
         <svg viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} preserveAspectRatio="none">
           <defs>
             <linearGradient id={`elevation-fill-${activity.id}`} x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor={activity.color} stopOpacity="0.35" />
-              <stop offset="100%" stopColor={activity.color} stopOpacity="0.02" />
+              <stop offset="0%" stopColor="red" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="red" stopOpacity="0.02" />
             </linearGradient>
           </defs>
           {[0.25, 0.5, 0.75].map((grid) => (
@@ -126,7 +126,7 @@ export const TrajectryHeight = ({
           <path
             d={linePath}
             fill="none"
-            stroke={activity.color}
+            stroke="red"
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth="1.4"

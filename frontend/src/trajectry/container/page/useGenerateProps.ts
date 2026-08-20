@@ -1,9 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import * as Sentry from "@sentry/react";
+
 import { trajectryActivities } from "../../domain/mockData";
-import type { MapStyleKey } from "../../domain/types";
+import type { MapStyleKey, TrajectryActivity } from "../../domain/types";
+import { toTrajectoryActivity, type ActivityResponse } from "../../../shared/types/trajectory";
 
 export const useGenerateTrajectryPageProps = () => {
   const [activeId, setActiveId] = useState(trajectryActivities[0].id);
+  const [activities, setActivities] = useState(trajectryActivities);
   const activeActivity = useMemo(
     () => trajectryActivities.find((activity) => activity.id === activeId) ?? trajectryActivities[0],
     [activeId],
@@ -31,6 +35,10 @@ export const useGenerateTrajectryPageProps = () => {
     if (nextPhoto) setHere(nextPhoto.at);
   };
 
+  const addActivity = (activity: TrajectryActivity[]) => {
+    setActivities((prev) => [...activity, ...prev]);
+  };
+
   return {
     activities: trajectryActivities,
     activeActivity,
@@ -45,5 +53,6 @@ export const useGenerateTrajectryPageProps = () => {
     onOpenUpload: () => setUploadOpen(true),
     onSelectActivity: selectActivity,
     onSelectPhoto: selectPhoto,
+    addActivities: addActivity,
   };
 };

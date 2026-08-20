@@ -58,3 +58,50 @@ pub fn draw_maze(
     };
     ctx.stroke();
 }
+
+// ランダム迷路を生成して1D(線)で描画し、通路のビットマスク(セルごとにUP/RIGHT/DOWN/LEFTが
+// 開いているか)を返す。このビットマスクをJS側で保持しておくことで、生成した迷路そのものを
+// プレイ画面や別の描画スタイル(2Dタイル表示など)に引き継げる。
+#[wasm_bindgen]
+pub fn create_random_maze(canvas_id: String, row: usize, col: usize, space: f64) -> Vec<u8> {
+    let walls = maze::wall_grid::generate_walls(row, col);
+    draw_random_maze(canvas_id, walls.clone(), row, col, space);
+    walls
+}
+
+// 既に生成済みの壁ビットマスクを、1D(線)で再描画する。迷路を再生成せずに
+// 表示スタイルだけを切り替えたい場合に使う。
+#[wasm_bindgen]
+pub fn draw_random_maze(canvas_id: String, walls: Vec<u8>, row: usize, col: usize, space: f64) {
+    if !random_maze::validate(row, col, space) {
+        return;
+    }
+
+    let ctx = dom::fetch_2d_context(&canvas_id);
+    let width = space * col as f64;
+    let height = space * row as f64;
+
+    ctx.clear_rect(0.0, 0.0, width, height);
+    ctx.begin_path();
+    ctx.rect(0.0, 0.0, width, height);
+    maze::wall_grid::draw_walls(&ctx, &walls, row, col, space);
+    ctx.stroke();
+}
+
+// 既に生成済みの壁ビットマスクを、幅を持った2Dタイルとして再描画する。
+// 壁も床も同じ大きさのタイルとして並べたタイルマップになる。
+#[wasm_bindgen]
+pub fn draw_random_maze_tiles(
+    canvas_id: String,
+    walls: Vec<u8>,
+    row: usize,
+    col: usize,
+    tile_size: f64,
+) {
+    if row == 0 || col == 0 || !tile_size.is_finite() || tile_size <= 0.0 {
+        return;
+    }
+
+    let ctx = dom::fetch_2d_context(&canvas_id);
+    maze::tile_grid::draw_tiles(&ctx, &walls, row, col, tile_size);
+}

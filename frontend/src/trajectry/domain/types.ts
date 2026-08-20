@@ -7,7 +7,6 @@ export type TrajectryPhoto = {
   at: number;
   caption: string;
   stamp: string;
-  color: string;
 };
 
 export type TrajectryActivity = {
@@ -19,7 +18,6 @@ export type TrajectryActivity = {
   km: number;
   gain: number;
   duration: string;
-  color: string;
   note: string;
   center: LngLat;
   zoom: number;

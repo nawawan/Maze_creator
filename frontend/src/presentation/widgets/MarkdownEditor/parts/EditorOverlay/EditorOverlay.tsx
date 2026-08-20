@@ -1,4 +1,5 @@
-import { sharedEditorStyle } from '../constants';
+import { useLayoutEffect, useRef } from 'react';
+import { sharedEditorStyle, ROW_HEIGHT_PX } from '../constants';
 
 const escapeHtml = (text: string): string =>
     text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -25,9 +26,36 @@ export type EditorOverlayProps = {
     onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onScroll: () => void;
     onInsert: (newMarkdown: string, cursorPos: number) => void;
+    onLineWrapsChange?: (lineWraps: number[]) => void;
 };
 
-const EditorOverlay = ({ preRef, textareaRef, markdown, onChange, onScroll, onInsert }: EditorOverlayProps) => {
+const EditorOverlay = ({ preRef, textareaRef, markdown, onChange, onScroll, onInsert, onLineWrapsChange }: EditorOverlayProps) => {
+    const measureRef = useRef<HTMLDivElement>(null);
+    const lineRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+    const lines = markdown.split('\n');
+
+    // The visible <pre>/<textarea> wrap long lines (white-space: pre-wrap), so a
+    // single logical line can span multiple visual rows. This hidden mirror
+    // shares the exact same font/width/wrapping rules and lets us measure how
+    // many visual rows each logical line actually occupies, so the line-number
+    // gutter (LineNumbers) can grow to match instead of drifting out of sync.
+    useLayoutEffect(() => {
+        const measure = () => {
+            const wraps = lines.map((_, i) => {
+                const el = lineRefs.current.get(i);
+                if (!el) return 1;
+                return Math.max(1, Math.round(el.getBoundingClientRect().height / ROW_HEIGHT_PX));
+            });
+            onLineWrapsChange?.(wraps);
+        };
+        measure();
+        const el = measureRef.current;
+        if (!el || typeof ResizeObserver === 'undefined') return;
+        const observer = new ResizeObserver(measure);
+        observer.observe(el);
+        return () => observer.disconnect();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [markdown, onLineWrapsChange]);
 
     const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -53,6 +81,32 @@ const EditorOverlay = ({ preRef, textareaRef, markdown, onChange, onScroll, onIn
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
         >
+            <div
+                ref={measureRef}
+                aria-hidden="true"
+                style={{
+                    ...sharedEditorStyle,
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    overflow: 'hidden',
+                    visibility: 'hidden',
+                    pointerEvents: 'none',
+                }}
+            >
+                {lines.map((line, i) => (
+                    <div
+                        key={i}
+                        ref={(el) => {
+                            if (el) lineRefs.current.set(i, el);
+                            else lineRefs.current.delete(i);
+                        }}
+                    >
+                        {line.length > 0 ? line : '​'}
+                    </div>
+                ))}
+            </div>
             <pre
                 ref={preRef}
                 aria-hidden="true"

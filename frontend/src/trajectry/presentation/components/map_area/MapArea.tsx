@@ -58,14 +58,14 @@ const addTrackLayers = (map: MapLibreMap, activity: TrajectryActivity) => {
     id: "track-glow",
     type: "line",
     source: TRACK_SOURCE_ID,
-    paint: { "line-color": activity.color, "line-width": 10, "line-opacity": 0.18, "line-blur": 3 },
+    paint: { "line-color": "red", "line-width": 10, "line-opacity": 0.18, "line-blur": 3 },
     layout: { "line-cap": "round", "line-join": "round" },
   });
   map.addLayer({
     id: "track",
     type: "line",
     source: TRACK_SOURCE_ID,
-    paint: { "line-color": activity.color, "line-width": 4, "line-opacity": 0.95 },
+    paint: { "line-color": "red", "line-width": 4, "line-opacity": 0.95 },
     layout: { "line-cap": "round", "line-join": "round" },
   });
 };

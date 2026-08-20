@@ -33,6 +33,7 @@ async fn main() {
         cf_access_team_domain: env::var("CF_ACCESS_TEAM_DOMAIN")
             .expect("CF_ACCESS_TEAM_DOMAIN must be set"),
         cf_access_aud: env::var("CF_ACCESS_AUD").expect("CF_ACCESS_AUD must be set"),
+        blog_r2_bucket: env::var("BLOG_R2_BUCKET").expect("BLOG_R2_BUCKET must be set"),
     };
 
     let jwks_cache = JwksCache::new(config.cf_access_team_domain.clone());
@@ -70,7 +71,7 @@ fn create_blog_router(service: Arc<Service>) -> Router {
         .route("/", get(Handler::list_blogs).post(Handler::update_blog))
         .route("/{id}", get(Handler::get_blog))
         .route("/images", post(Handler::upload_blog_image))
-        .route("/drafts", post(Handler::craete_draft))
+        .route("/drafts", post(Handler::create_draft))
         .fallback(api_fallback)
         .with_state(service);
 
