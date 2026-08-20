@@ -15,6 +15,7 @@ type TrajectryPageState = {
   onOpenUpload: () => void;
   onSelectActivity: (activityId: string) => void;
   onSelectPhoto: (photoId: string) => void;
+  addActivities: (activities: TrajectryActivity[]) => void;
 };
 
 export const TrajectryPageStateContext = createContext<TrajectryPageState | null>(null);

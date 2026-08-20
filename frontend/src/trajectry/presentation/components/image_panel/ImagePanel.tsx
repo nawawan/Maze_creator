@@ -138,7 +138,7 @@ export const ImagePanel = ({ activity, activePhotoId, here, onPhotoSelect }: Ima
                   aria-label={photo.caption}
                   disableRipple
                   onClick={() => onPhotoSelect(photo.id)}
-                  style={{ background: photoBackground(photo.color) }}
+                  style={{ background: photoBackground("red") }}
                   sx={{ border: photo.id === activePhotoId ? "2px solid var(--pin)" : "1px solid var(--rule)" }}
                   type="button"
                 >

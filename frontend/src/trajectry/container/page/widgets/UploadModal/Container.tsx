@@ -1,8 +1,8 @@
 import { UploadModal } from "../../../../presentation/components/upload_modal/UploadModal";
-import { useTrajectryPageState } from "../../state/useTrajectryPageState";
+import { useGenerateProps } from "./useGenerateProps";
 
 export const UploadModalContainer = () => {
-  const { onCloseUpload, uploadOpen } = useTrajectryPageState();
+  const props = useGenerateProps();
 
-  return <UploadModal onClose={onCloseUpload} open={uploadOpen} />;
+  return <UploadModal {...props} />;
 };
