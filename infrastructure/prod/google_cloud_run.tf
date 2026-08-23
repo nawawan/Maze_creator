@@ -11,15 +11,11 @@ resource "google_cloud_run_v2_service" "nawawan_prod_service" {
     min_instance_count = 0
   }
 
-  lifecycle {
-    ignore_changes = [template[0].containers[0].image]
-  }
-
   template {
     service_account = google_service_account.nawawan_prod_reader.email
 
     containers {
-      image = "asia-northeast1-docker.pkg.dev/nawawan/nawawan-prod-repository/nawawan-playground:v1.1.0"
+      image = "asia-northeast1-docker.pkg.dev/nawawan/nawawan-prod-repository/nawawan-playground:v1.2.0"
 
       env {
         name  = "ENV"
