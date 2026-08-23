@@ -165,7 +165,7 @@ jobs:
         run: |
           sed -i -E "s#(nawawan-playground:)v[0-9]+\.[0-9]+\.[0-9]+#\1v${{ needs.release.outputs.version }}#" infrastructure/prod/google_cloud_run.tf
       - name: Open pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: backend-release/v${{ needs.release.outputs.version }}
           add-paths: infrastructure/prod/google_cloud_run.tf
