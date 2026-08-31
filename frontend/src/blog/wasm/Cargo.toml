@@ -1,0 +1,15 @@
+[package]
+name = "markdown-parser"
+version = "0.1.0"
+description = "Parse markdown to HTML by wasm"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+pulldown-cmark = { version = "0.12", default-features = false, features = ["html"] }
+console_error_panic_hook = "0.1"
+wasm-logger = "0.2.0"
+log = "0.4.28"
